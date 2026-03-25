@@ -13,6 +13,9 @@ node_modules/
 .DS_Store
 ._*
 
+# Claude
+CLAUDE.md
+
 # Environment
 .env
 .env.*
