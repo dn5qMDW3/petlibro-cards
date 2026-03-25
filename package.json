@@ -1,6 +1,6 @@
 {
   "name": "petlibro-cards",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Custom Home Assistant Lovelace card for PetLibro devices",
   "type": "module",
   "main": "dist/petlibro-cards.js",

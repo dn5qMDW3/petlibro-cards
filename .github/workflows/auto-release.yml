@@ -1,0 +1,89 @@
+name: Auto Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "package.json"
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    name: Check if release needed
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.check.outputs.should_release }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check for existing tag
+        id: check
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          if git tag -l "v$VERSION" | grep -q .; then
+            echo "Tag v$VERSION already exists — skipping"
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          else
+            echo "No tag for v$VERSION — will release"
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          fi
+
+  validate:
+    name: Validate
+    needs: check
+    if: needs.check.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - uses: hacs/action@main
+        with:
+          category: plugin
+
+  release:
+    name: Create Release
+    needs: [check, validate]
+    if: needs.check.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Create tag
+        env:
+          VERSION: ${{ needs.check.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v${VERSION}"
+          git push origin "v${VERSION}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.check.outputs.version }}
+          generate_release_notes: true
+          files: dist/petlibro-cards.js
