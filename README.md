@@ -49,14 +49,16 @@ Add the card via the UI card picker or use YAML:
 
 ```yaml
 type: custom:petlibro-card
-entity: sensor.my_feeder_electric_quantity
+device_id: abc123def456  # Select via UI device picker
 ```
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `entity` | string | **required** | Any entity from your PetLibro device |
+| `device_id` | string | **required** | PetLibro device ID (picked via UI editor) |
 | `name` | string | auto | Override the device name |
 | `show_controls` | boolean | `true` | Show control buttons |
+
+> **Legacy support**: configs using `entity:` (any entity from the device) still work.
 
 ## Requirements
 

@@ -18,6 +18,7 @@ export class PetlibroCardEditor extends LitElement {
       margin-bottom: 4px;
       color: var(--primary-text-color);
     }
+    .editor-row ha-device-picker,
     .editor-row ha-entity-picker {
       width: 100%;
     }
@@ -36,6 +37,11 @@ export class PetlibroCardEditor extends LitElement {
       align-items: center;
       gap: 8px;
     }
+    .migration-note {
+      font-size: 12px;
+      color: var(--secondary-text-color);
+      margin-top: 4px;
+    }
   `;
 
   public setConfig(config: PetlibroCardConfig): void {
@@ -47,16 +53,23 @@ export class PetlibroCardEditor extends LitElement {
       return html``;
     }
 
+    // Show entity picker for legacy configs that have entity but no device_id
+    const isLegacy = this._config.entity && !this._config.device_id;
+
     return html`
       <div class="editor-row">
-        <label>Entity (any entity from the PetLibro device)</label>
-        <ha-entity-picker
+        <label>PetLibro Device</label>
+        <ha-device-picker
           .hass=${this.hass}
-          .value=${this._config.entity}
-          .includeDomains=${['sensor', 'binary_sensor', 'switch', 'button', 'number', 'select']}
-          @value-changed=${this._entityChanged}
-          allow-custom-entity
-        ></ha-entity-picker>
+          .value=${this._config.device_id || ''}
+          .deviceFilter=${this._filterPetlibroDevices}
+          @value-changed=${this._deviceChanged}
+        ></ha-device-picker>
+        ${isLegacy ? html`
+          <div class="migration-note">
+            Migrating from entity-based config. Select a device to upgrade.
+          </div>
+        ` : ''}
       </div>
       <div class="editor-row">
         <label>Name (optional override)</label>
@@ -81,10 +94,28 @@ export class PetlibroCardEditor extends LitElement {
     `;
   }
 
-  private _entityChanged(ev: CustomEvent): void {
-    const entity = ev.detail.value;
-    if (!entity) return;
-    this._updateConfig({ ...this._config, entity });
+  /**
+   * Filter callback for ha-device-picker: only show petlibro devices.
+   * HA passes each device from the registry; we check if any entity
+   * on the device belongs to the "petlibro" platform.
+   */
+  private _filterPetlibroDevices = (device: any): boolean => {
+    if (!this.hass?.entities) return false;
+    for (const entry of Object.values(this.hass.entities)) {
+      if ((entry as any).device_id === device.id && (entry as any).platform === 'petlibro') {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  private _deviceChanged(ev: CustomEvent): void {
+    const device_id = ev.detail.value;
+    if (!device_id) return;
+    // When switching to device picker, drop legacy entity field
+    const { entity: _entity, ...rest } = this._config;
+    void _entity; // consumed — dropping legacy field
+    this._updateConfig({ ...rest, device_id });
   }
 
   private _nameChanged(ev: Event): void {

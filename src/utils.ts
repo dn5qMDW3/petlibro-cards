@@ -109,6 +109,20 @@ export function detectDeviceType(entities: DeviceEntities): DeviceType {
 }
 
 /**
+ * Find the first entity_id belonging to a device.
+ * Used when config has device_id but no entity (new device-picker flow).
+ */
+export function getFirstEntityId(hass: HomeAssistant, deviceId: string): string | undefined {
+  if (!hass.entities) return undefined;
+  for (const [entityId, entry] of Object.entries(hass.entities)) {
+    if (entry.device_id === deviceId) {
+      return entityId;
+    }
+  }
+  return undefined;
+}
+
+/**
  * Safely get the state string for an entity.
  */
 export function getStateValue(hass: HomeAssistant, entityId: string | undefined): string | undefined {

@@ -9,6 +9,7 @@ import {
   getDeviceId,
   getDeviceImage,
   getDeviceName,
+  getFirstEntityId,
   isEntityOn,
 } from './utils';
 import { renderFeederCard } from './cards/feeder-card';
@@ -42,12 +43,12 @@ export class PetlibroCard extends LitElement {
   }
 
   public static getStubConfig(): Record<string, unknown> {
-    return { entity: '' };
+    return { device_id: '' };
   }
 
   public setConfig(config: PetlibroCardConfig): void {
-    if (!config.entity) {
-      throw new Error('Please define an entity');
+    if (!config.device_id && !config.entity) {
+      throw new Error('Please select a PetLibro device');
     }
     this._config = {
       show_controls: true,
@@ -72,11 +73,18 @@ export class PetlibroCard extends LitElement {
   }
 
   protected willUpdate(changedProps: PropertyValues): void {
-    if (!this.hass || !this._config?.entity) return;
+    if (!this.hass || !this._config) return;
 
     // Re-discover entities when hass or config changes
     if (changedProps.has('hass') || changedProps.has('_config')) {
-      const deviceId = getDeviceId(this.hass, this._config.entity);
+      // Resolve device_id: prefer config.device_id, fall back to entity lookup
+      let deviceId: string | undefined;
+      if (this._config.device_id) {
+        deviceId = this._config.device_id;
+      } else if (this._config.entity) {
+        deviceId = getDeviceId(this.hass, this._config.entity);
+      }
+
       if (deviceId && deviceId !== this._deviceId) {
         this._deviceId = deviceId;
         this._entities = getDeviceEntities(this.hass, deviceId);
@@ -103,7 +111,8 @@ export class PetlibroCard extends LitElement {
     }
 
     // Check if primary entity is unavailable
-    const primaryState = this.hass.states[this._config.entity]?.state;
+    const primaryEntityId = this._config.entity || getFirstEntityId(this.hass, this._deviceId!) || '';
+    const primaryState = this.hass.states[primaryEntityId]?.state;
     if (primaryState === 'unavailable') {
       return html`
         <ha-card>
@@ -126,7 +135,9 @@ export class PetlibroCard extends LitElement {
 
   private _renderHeader(): TemplateResult {
     const name = this._config.name || getDeviceName(this.hass, this._deviceId!) || 'PetLibro Device';
-    const imageUrl = getDeviceImage(this.hass, this._config.entity, this._deviceId!);
+    // Use configured entity or find any entity from the device for image lookup
+    const representativeEntity = this._config.entity || getFirstEntityId(this.hass, this._deviceId!) || '';
+    const imageUrl = getDeviceImage(this.hass, representativeEntity, this._deviceId!);
     const online = isEntityOn(this.hass, this._entities!.binary_sensors.online);
     const model = this.hass.devices?.[this._deviceId!]?.model;
 

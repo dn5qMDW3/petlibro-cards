@@ -2,7 +2,8 @@ export type DeviceType = 'feeder' | 'fountain' | 'litter_box';
 
 export interface PetlibroCardConfig {
   type: string;
-  entity: string;
+  device_id?: string;        // Primary: picked via device picker
+  entity?: string;           // Legacy: backward compat for existing dashboards
   name?: string;
   show_controls?: boolean;
 }
