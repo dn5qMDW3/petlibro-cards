@@ -167,11 +167,13 @@ export function getDeviceImage(
 
 /**
  * Check if an entity's state is "on" or equivalent truthy value.
+ * Connectivity binary_sensors (device_class: connectivity) use "connected"/"not_connected"
+ * instead of "on"/"off", so we check for both.
  */
 export function isEntityOn(hass: HomeAssistant, entityId: string | undefined): boolean {
   if (!entityId) return false;
   const state = hass.states[entityId]?.state;
-  return state === 'on' || state === 'true' || state === 'True';
+  return state === 'on' || state === 'connected' || state === 'true' || state === 'True';
 }
 
 /**
