@@ -96,14 +96,22 @@ export class PetlibroCardEditor extends LitElement {
 
   /**
    * Filter callback for ha-device-picker: only show petlibro devices.
-   * HA passes each device from the registry; we check if any entity
-   * on the device belongs to the "petlibro" platform.
+   * HA passes a DeviceRegistryEntry which has `identifiers: [domain, id][]`.
+   * The petlibro integration registers devices as ("petlibro", serial).
    */
   private _filterPetlibroDevices = (device: any): boolean => {
-    if (!this.hass?.entities) return false;
-    for (const entry of Object.values(this.hass.entities)) {
-      if ((entry as any).device_id === device.id && (entry as any).platform === 'petlibro') {
-        return true;
+    // Primary: check device identifiers (most reliable)
+    if (device.identifiers) {
+      for (const [domain] of device.identifiers) {
+        if (domain === 'petlibro') return true;
+      }
+    }
+    // Fallback: check config entries → entity platform
+    if (this.hass?.entities) {
+      for (const entry of Object.values(this.hass.entities)) {
+        if ((entry as any).device_id === device.id && (entry as any).platform === 'petlibro') {
+          return true;
+        }
       }
     }
     return false;
