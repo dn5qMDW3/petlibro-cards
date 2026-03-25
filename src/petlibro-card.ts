@@ -138,7 +138,8 @@ export class PetlibroCard extends LitElement {
     // Use configured entity or find any entity from the device for image lookup
     const representativeEntity = this._config.entity || getFirstEntityId(this.hass, this._deviceId!) || '';
     const imageUrl = getDeviceImage(this.hass, representativeEntity, this._deviceId!);
-    const online = isEntityOn(this.hass, this._entities!.binary_sensors.online);
+    // online entity may be keyed as "online" (from integration key) or "wi_fi" (from HA entity name)
+    const online = isEntityOn(this.hass, this._entities!.binary_sensors.online ?? this._entities!.binary_sensors.wi_fi);
     const model = this.hass.devices?.[this._deviceId!]?.model;
 
     return html`

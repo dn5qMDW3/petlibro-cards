@@ -78,6 +78,7 @@ export const ALL_KNOWN_KEYS = [
   'wifi_ssid',
   'wifi_rssi',
   'online',
+  'wi_fi',
   // Feeder-specific (Polar)
   'ring_bell',
   'rotate_food_bowl',
