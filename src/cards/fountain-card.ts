@@ -52,7 +52,7 @@ export function renderFountainCard(
           <ha-icon class="metric-icon" icon="mdi:water"></ha-icon>
           <div class="metric-content">
             <div class="metric-label">Remaining Water</div>
-            <div class="metric-value">${remainingWater} ${remainingWaterUnit}</div>
+            <div class="metric-value">${Math.round(Number(remainingWater))} ${remainingWaterUnit}</div>
           </div>
         </div>
       ` : nothing}

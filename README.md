@@ -6,7 +6,7 @@
 
 Custom [Home Assistant](https://www.home-assistant.io/) Lovelace card for [PetLibro](https://www.petlibro.com/) smart pet devices. Auto-detects your device type and displays the appropriate UI.
 
-![Petlibro Cards Preview](images/preview.svg)
+![Petlibro Cards — Fountain](images/screenshot-fountain.png)
 
 ## Supported Devices
 
