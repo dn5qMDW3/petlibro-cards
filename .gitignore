@@ -1,8 +1,7 @@
 # Dependencies
 node_modules/
 
-# Build output
-dist/
+# Build output (dist/ is NOT ignored — HACS needs it in the repo before a release exists)
 
 # IDE
 .idea/
