@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# IDE
+.idea/
+*.swp
+*.swo
+.vscode/
+
+# macOS
+.DS_Store
+._*
+
+# Environment
+.env
+.env.*
+
+# Yarn
+.yarn/
+.pnp.*
