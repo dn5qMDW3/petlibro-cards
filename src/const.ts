@@ -1,4 +1,4 @@
-export const CARD_VERSION = '0.3.0';
+export const CARD_VERSION = '0.4.0';
 export const CARD_NAME = 'petlibro-card';
 export const EDITOR_NAME = 'petlibro-card-editor';
 
