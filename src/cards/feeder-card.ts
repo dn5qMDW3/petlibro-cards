@@ -6,6 +6,7 @@ export function renderFeederCard(
   hass: HomeAssistant,
   entities: DeviceEntities,
   onButtonPress: (entityId: string) => void,
+  onSwitchToggle: (entityId: string) => void,
 ): TemplateResult {
   const battery = getNumericState(hass, entities.sensors.electric_quantity);
   const foodLow = isEntityOn(hass, entities.binary_sensors.food_low);
@@ -18,6 +19,14 @@ export function renderFeederCard(
   const todayUnit = hass.states[entities.sensors.today_feeding_quantity_weight ?? '']?.attributes?.unit_of_measurement ?? 'g';
   const nextUnit = hass.states[entities.sensors.next_feed_quantity_weight ?? '']?.attributes?.unit_of_measurement ?? 'g';
   const lightOn = isEntityOn(hass, entities.binary_sensors.light_switch);
+
+  // Polar Wet Food Feeder specific
+  const temperature = getStateValue(hass, entities.sensors.temperature);
+  const platePosition = getStateValue(hass, entities.selects.plate_position);
+  const nextFeedingTime = getStateValue(hass, entities.sensors.next_feeding_time);
+  const nextFeedingEndTime = getStateValue(hass, entities.sensors.next_feeding_end_time);
+  const nextFeedingDay = getStateValue(hass, entities.sensors.next_feeding_day);
+  const cleaningDays = getNumericState(hass, entities.sensors.remaining_cleaning_days);
 
   return html`
     <div class="metrics-grid">
@@ -78,6 +87,50 @@ export function renderFeederCard(
           </div>
         </div>
       ` : nothing}
+
+      ${/* Polar Wet Food Feeder metrics */ ''}
+
+      ${temperature !== undefined ? html`
+        <div class="metric-item">
+          <ha-icon class="metric-icon" icon="mdi:thermometer"></ha-icon>
+          <div class="metric-content">
+            <div class="metric-label">Temperature</div>
+            <div class="metric-value">${temperature}°C</div>
+          </div>
+        </div>
+      ` : nothing}
+
+      ${platePosition !== undefined ? html`
+        <div class="metric-item">
+          <ha-icon class="metric-icon" icon="mdi:rotate-3d-variant"></ha-icon>
+          <div class="metric-content">
+            <div class="metric-label">Plate Position</div>
+            <div class="metric-value">${platePosition}</div>
+          </div>
+        </div>
+      ` : nothing}
+
+      ${nextFeedingTime !== undefined ? html`
+        <div class="metric-item">
+          <ha-icon class="metric-icon" icon="mdi:clock-outline"></ha-icon>
+          <div class="metric-content">
+            <div class="metric-label">Next Feeding</div>
+            <div class="metric-value">
+              ${nextFeedingDay ? `${nextFeedingDay} ` : ''}${nextFeedingTime}${nextFeedingEndTime ? ` – ${nextFeedingEndTime}` : ''}
+            </div>
+          </div>
+        </div>
+      ` : nothing}
+
+      ${cleaningDays !== undefined ? html`
+        <div class="metric-item ${cleaningDays <= 0 ? 'alert' : ''}">
+          <ha-icon class="metric-icon" icon="mdi:spray-bottle"></ha-icon>
+          <div class="metric-content">
+            <div class="metric-label">Cleaning</div>
+            <div class="metric-value">${cleaningDays} days</div>
+          </div>
+        </div>
+      ` : nothing}
     </div>
 
     <div class="controls-row">
@@ -85,6 +138,31 @@ export function renderFeederCard(
         <button class="control-button" @click=${() => onButtonPress(entities.buttons.manual_feed)}>
           <ha-icon icon="mdi:food-drumstick"></ha-icon>
           Feed Now
+        </button>
+      ` : nothing}
+
+      ${/* Polar: Open/Close Lid switch (instead of Feed Now button) */ ''}
+      ${entities.switches.manual_feed_now ? html`
+        <button
+          class="control-button ${isEntityOn(hass, entities.switches.manual_feed_now) ? 'active' : ''}"
+          @click=${() => onSwitchToggle(entities.switches.manual_feed_now)}
+        >
+          <ha-icon icon="mdi:door-open"></ha-icon>
+          Open Lid
+        </button>
+      ` : nothing}
+
+      ${entities.buttons.rotate_food_bowl ? html`
+        <button class="control-button" @click=${() => onButtonPress(entities.buttons.rotate_food_bowl)}>
+          <ha-icon icon="mdi:rotate-3d-variant"></ha-icon>
+          Rotate
+        </button>
+      ` : nothing}
+
+      ${entities.buttons.ring_bell ? html`
+        <button class="control-button" @click=${() => onButtonPress(entities.buttons.ring_bell)}>
+          <ha-icon icon="mdi:bell-ring"></ha-icon>
+          Ring
         </button>
       ` : nothing}
 

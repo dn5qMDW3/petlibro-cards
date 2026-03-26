@@ -172,6 +172,7 @@ export class PetlibroCard extends LitElement {
           this.hass,
           this._entities,
           (entityId) => this._handleButtonPress(entityId),
+          (entityId) => this._handleSwitchToggle(entityId),
         );
       case 'fountain':
         return renderFountainCard(

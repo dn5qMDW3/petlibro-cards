@@ -10,6 +10,7 @@ export const FEEDER_SIGNATURE_KEYS = [
   'manual_feed',
   'feeding_plan_state',
   'today_feeding_quantity_weight',
+  'rotate_food_bowl',
 ] as const;
 
 export const FOUNTAIN_SIGNATURE_KEYS = [
@@ -79,14 +80,18 @@ export const ALL_KNOWN_KEYS = [
   'wifi_rssi',
   'online',
   'wi_fi',
-  // Feeder-specific (Polar)
+  // Feeder-specific (Polar Wet Food)
   'ring_bell',
   'rotate_food_bowl',
   'reposition_schedule',
   'next_feeding_day',
   'next_feeding_time',
+  'next_feeding_end_time',
+  'manual_feed_now',
   'manual_feed_quantity_cups',
   'lid_close_time',
+  'temperature',
+  'plate_position',
   // Fountain sensors
   'remaining_cleaning_days',
   'remaining_filter_days',
