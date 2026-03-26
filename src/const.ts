@@ -7,6 +7,7 @@ export const EDITOR_NAME = 'petlibro-card-editor';
 
 export const FEEDER_SIGNATURE_KEYS = [
   'food_low',
+  'food_status',        // name-based alias for food_low
   'manual_feed',
   'feeding_plan_state',
   'today_feeding_quantity_weight',
@@ -17,19 +18,131 @@ export const FOUNTAIN_SIGNATURE_KEYS = [
   'remaining_filter_days',
   'water_low',
   'remaining_water',
+  'remaining_water_volume', // name-based alias for remaining_water
 ] as const;
 
 export const LITTER_BOX_SIGNATURE_KEYS = [
   'rubbish_full_state',
-  'trigger_clean',
-  'running_state',
+  'waste_bin_full',        // name-based alias for rubbish_full_state
   'garbage_warehouse_state',
+  'waste_bin_state',       // name-based alias for garbage_warehouse_state
+  // Note: running_state removed — shared with Polar Wet Food Feeder
 ] as const;
 
+/**
+ * Maps HA name-based entity_id suffixes back to canonical integration keys.
+ * HA generates entity_ids from the entity `name` field (snake_cased),
+ * NOT from the `key` field. This map resolves the aliases so card code
+ * can always look up entities by their canonical key.
+ */
+export const KEY_ALIASES: Record<string, string> = {
+  // --- Sensors ---
+  // Common across feeders
+  'wi_fi_signal_strength': 'wifi_rssi',
+  'wi_fi_ssid': 'wifi_ssid',
+  'wi_fi_s_s_i_d': 'wifi_ssid',
+  'battery_level': 'battery_state',
+  'battery_ac': 'electric_quantity',
+  'buttons_lock': 'child_lock_switch',
+  'remaining_desiccant_days': 'remaining_desiccant',
+  'feeding_plan': 'feeding_plan_state',
+  'display_value': 'display_selection',
+  'todays_total_eating_time': 'today_eating_time',
+  // Camera feeder
+  'camera_resolution': 'resolution',
+  'night_vision_mode': 'night_vision',
+  'video_recording_enabled': 'enable_video_record',
+  'video_recording_switch': 'video_record_switch',
+  'video_recording_mode': 'video_record_mode',
+  // Polar Wet Food Feeder
+  'feeding_schedule': 'next_feeding_day',
+  'feeding_begins': 'next_feeding_time',
+  'feeding_ends': 'next_feeding_end_time',
+  'manually_open_close_lid': 'manual_feed_now',
+  // Fountain sensors
+  'remaining_water_volume': 'remaining_water',
+  'todays_water_consumption': 'today_drinking_amount',
+  'total_water_used_today': 'today_drinking_amount',
+  'yesterdays_water_consumption': 'yesterday_drinking_amount',
+  'todays_total_drinking_time': 'today_drinking_time',
+  'todays_average_drinking_time': 'today_avg_time',
+  'today_drinking_times': 'today_drinking_count',
+  'yesterday_drinking_times': 'yesterday_drinking_count',
+  'current_weight_percent': 'weight_percent',
+  'water_time_duration': 'use_water_duration',
+  'tank_capacity': 'tank_total_ml',
+  'alert_message': 'exception_message',
+  'power_source': 'power_state',
+  'human_detection_sensitivity': 'human_sensitivity_level',
+  'battery_status': 'battery_charge_state',
+  'battery8_hour_supply': 'battery_supply_8_hours',
+  // Litter box sensors
+  'litter_level': 'weight_percent',
+  'litter_weight': 'weight',
+  'cleanliness_state': 'clean_state',
+  'waste_bin_state': 'garbage_warehouse_state',
+  'mat_replacement_days': 'remaining_mat_days',
+  'filter_replacement_days': 'remaining_replacement_days',
+
+  // --- Binary sensors ---
+  'food_dispenser': 'food_dispenser_state',
+  'food_status': 'food_low',
+  'wi_fi': 'online',
+  'sleep_mode': 'whether_in_sleep_mode',
+  'lid_status': 'door_blocked',
+  'lid': 'door_state',
+  'indicator': 'light_switch',
+  'sound_status': 'sound_switch',
+  'food_outlet': 'food_outlet_state',
+  'filter_l_e_d': 'filter_led_switch',
+  'device_error': 'device_stopped_working',
+  'device_fault': 'device_stopped_working',
+  'door_error': 'barn_door_error',
+  'deodorization_active': 'deodorization_state_on',
+  'display_status': 'display_switch',
+  'waste_bin_full': 'rubbish_full_state',
+  'waste_bin_installed': 'rubbish_inplace_state',
+  'water_dispensing_state': 'water_state',
+  'vacuum_active': 'vacuum_state',
+  'door': 'door_open',
+
+  // --- Buttons ---
+  'run_air_purifier': 'trigger_vacuum',
+  'open_door': 'trigger_open_door',
+  'close_door': 'trigger_close_door',
+  'level_litter': 'trigger_level_litter',
+  'empty_waste_bin': 'trigger_empty_waste',
+  'start_clean_cycle': 'trigger_clean',
+  'stop_current_action': 'trigger_stop_action',
+  'manually_open_lid': 'manual_lid_open',
+  'turn_on_sleep_mode': 'sleep_on',
+  'turn_off_sleep_mode': 'sleep_off',
+  'turn_on_sound': 'sound_on',
+  'turn_off_sound': 'sound_off',
+  'turn_on_indicator': 'light_on',
+  'turn_off_indicator': 'light_off',
+  'turn_on_display': 'display_on',
+  'turn_off_display': 'display_off',
+  'desiccant_replaced': 'desiccant_reset',
+  'reposition_the_schedule': 'reposition_schedule',
+
+  // --- Switches ---
+  'light': 'light_switch',
+  'sound': 'sound_switch',
+  'deodorization': 'deodorization_mode_switch',
+
+  // --- Selects ---
+  'icon_to_display': 'display_icon',
+
+  // --- Text ---
+  'text_on_display': 'display_text',
+};
+
 // All known entity key suffixes across all device types.
+// Includes both canonical keys AND name-based aliases.
 // Ordered longest-first for unambiguous suffix matching.
 export const ALL_KNOWN_KEYS = [
-  // Feeder sensors
+  // Feeder sensors (canonical keys)
   'today_feeding_quantity_weight',
   'today_feeding_quantity_volume',
   'last_feed_quantity_weight',
@@ -70,6 +183,7 @@ export const ALL_KNOWN_KEYS = [
   'display_off',
   'display_switch',
   'display_text',
+  'display_icon',
   'sleep_on',
   'sleep_off',
   'food_low',
@@ -80,6 +194,13 @@ export const ALL_KNOWN_KEYS = [
   'wifi_rssi',
   'online',
   'wi_fi',
+  // Camera feeder
+  'resolution',
+  'night_vision',
+  'enable_video_record',
+  'video_record_switch',
+  'video_record_mode',
+  'pump_air_state',
   // Feeder-specific (Polar Wet Food)
   'ring_bell',
   'rotate_food_bowl',
@@ -90,6 +211,8 @@ export const ALL_KNOWN_KEYS = [
   'manual_feed_now',
   'manual_feed_quantity_cups',
   'lid_close_time',
+  'lid_mode',
+  'lid_speed',
   'temperature',
   'plate_position',
   // Fountain sensors
@@ -108,7 +231,9 @@ export const ALL_KNOWN_KEYS = [
   'water_state',
   'water_interval',
   'water_dispensing_duration',
+  'water_dispensing_mode',
   'water_low_threshold',
+  'water_sensing_delay',
   'cleaning_cycle',
   'cleaning_reset',
   'filter_cycle',
@@ -125,8 +250,8 @@ export const ALL_KNOWN_KEYS = [
   'battery_supply_8_hours',
   'power_state',
   'radar_sensing_level',
-  'radar_gain',
   'radar_sensing_threshold',
+  'radar_gain',
   'human_sensitivity_level',
   // Litter box sensors
   'remaining_replacement_days',
@@ -155,4 +280,6 @@ export const ALL_KNOWN_KEYS = [
   'trigger_open_door',
   'trigger_close_door',
   'trigger_vacuum',
+  // --- Name-based aliases (HA entity_id suffixes derived from entity names) ---
+  ...Object.keys(KEY_ALIASES),
 ].sort((a, b) => b.length - a.length);

@@ -1,5 +1,6 @@
 import {
   ALL_KNOWN_KEYS,
+  KEY_ALIASES,
   FEEDER_SIGNATURE_KEYS,
   FOUNTAIN_SIGNATURE_KEYS,
   LITTER_BOX_SIGNATURE_KEYS,
@@ -32,7 +33,8 @@ function extractKeySuffix(entityId: string): string | undefined {
       // Ensure it's a proper boundary: preceded by '_' or is the entire object_id
       const prefix = objectId.substring(0, objectId.length - key.length);
       if (prefix === '' || prefix.endsWith('_')) {
-        return key;
+        // Resolve name-based aliases back to canonical integration keys
+        return KEY_ALIASES[key] ?? key;
       }
     }
   }
