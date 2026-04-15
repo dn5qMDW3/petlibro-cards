@@ -165,11 +165,20 @@ export function getDeviceImage(
   entityId: string,
   deviceId: string,
 ): string | undefined {
-  // Try entity_picture attribute first
+  // Try entity_picture on the representative entity first
   const picture = hass.states[entityId]?.attributes?.entity_picture;
   if (picture) return picture;
 
-  // Fall back to device configuration_url (which holds icon_url in petlibro)
+  // Scan all entities for one with entity_picture (dev-rebase-v2 sets it per-entity)
+  if (hass.entities) {
+    for (const [eid, entry] of Object.entries(hass.entities)) {
+      if (entry.device_id !== deviceId) continue;
+      const ep = hass.states[eid]?.attributes?.entity_picture;
+      if (ep) return ep;
+    }
+  }
+
+  // Fall back to device configuration_url (legacy)
   return hass.devices?.[deviceId]?.configuration_url ?? undefined;
 }
 
