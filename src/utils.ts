@@ -79,6 +79,8 @@ export function getDeviceEntities(hass: HomeAssistant, deviceId: string): Device
     const key = extractKeySuffix(entityId);
     if (key) {
       result[group][key] = entityId;
+    } else {
+      console.debug(`[petlibro-card] Unrecognized entity suffix: ${entityId}`);
     }
   }
 

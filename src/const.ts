@@ -193,6 +193,8 @@ export const ALL_KNOWN_KEYS = [
   'feeding_plan_unskip_today',
   'feeding_plan_today_enable_all',
   'feeding_plan_today_disable_all',
+  'feeding_plan_select',
+  'feeding_plan_today_select',
   'feeding_schedule',
   'desiccant_reset',
   'desiccant_frequency',

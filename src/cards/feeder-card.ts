@@ -28,8 +28,7 @@ export function renderFeederCard(
   const platePosition = getStateValue(hass, entities.selects.plate_position);
   const nextFeedingTime = getStateValue(hass, entities.sensors.next_feeding_time);
   const nextFeedingEndTime = getStateValue(hass, entities.sensors.next_feeding_end_time);
-  const nextFeedingDay = getStateValue(hass, entities.sensors.feeding_schedule);
-  const cleaningDays = getNumericState(hass, entities.sensors.remaining_cleaning_days);
+  const nextFeedingDay = getStateValue(hass, entities.sensors.next_feeding_day);
 
   return html`
     <div class="metrics-grid">
@@ -125,15 +124,6 @@ export function renderFeederCard(
         </div>
       ` : nothing}
 
-      ${cleaningDays !== undefined ? html`
-        <div class="metric-item ${cleaningDays <= 0 ? 'alert' : ''}">
-          <ha-icon class="metric-icon" icon="mdi:spray-bottle"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Cleaning</div>
-            <div class="metric-value">${cleaningDays} days</div>
-          </div>
-        </div>
-      ` : nothing}
     </div>
 
     <div class="controls-row">
@@ -180,7 +170,7 @@ export function renderFeederCard(
       ` : nothing}
     </div>
 
-    ${entities.selects.feeding_schedule ? html`
+    ${entities.selects.feeding_plan_select ? html`
       <div class="settings-section">
         <div class="settings-section-title">Feeding Schedule</div>
         <div class="settings-grid">
@@ -189,15 +179,15 @@ export function renderFeederCard(
             <div class="setting-control">
               <select
                 @change=${(e: Event) => onSelectChange(
-                  entities.selects.feeding_schedule,
+                  entities.selects.feeding_plan_select,
                   (e.target as HTMLSelectElement).value,
                 )}
               >
-                ${(hass.states[entities.selects.feeding_schedule]?.attributes?.options ?? []).map(
+                ${(hass.states[entities.selects.feeding_plan_select]?.attributes?.options ?? []).map(
                   (opt: string) => html`
                     <option
                       value=${opt}
-                      ?selected=${hass.states[entities.selects.feeding_schedule]?.state === opt}
+                      ?selected=${hass.states[entities.selects.feeding_plan_select]?.state === opt}
                     >${opt}</option>
                   `,
                 )}
