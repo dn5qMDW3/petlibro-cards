@@ -1,4 +1,4 @@
-export const CARD_VERSION = '0.4.1';
+export const CARD_VERSION = '0.5.0';
 export const CARD_NAME = 'petlibro-card';
 export const EDITOR_NAME = 'petlibro-card-editor';
 
@@ -16,7 +16,6 @@ export const FEEDER_SIGNATURE_KEYS = [
 
 export const FOUNTAIN_SIGNATURE_KEYS = [
   'remaining_filter_days',
-  'water_low',
   'remaining_water',
   'remaining_water_volume', // name-based alias for remaining_water
 ] as const;
@@ -55,7 +54,6 @@ export const KEY_ALIASES: Record<string, string> = {
   'video_recording_switch': 'video_record_switch',
   'video_recording_mode': 'video_record_mode',
   // Polar Wet Food Feeder
-  'feeding_schedule': 'next_feeding_day',
   'feeding_begins': 'next_feeding_time',
   'feeding_ends': 'next_feeding_end_time',
   'manually_open_close_lid': 'manual_feed_now',
@@ -87,6 +85,7 @@ export const KEY_ALIASES: Record<string, string> = {
   // --- Binary sensors ---
   'food_dispenser': 'food_dispenser_state',
   'food_status': 'food_low',
+  'today_s_feeding_schedule': 'feeding_plan_state',
   'wi_fi': 'online',
   'sleep_mode': 'whether_in_sleep_mode',
   'lid_status': 'door_blocked',
@@ -94,7 +93,6 @@ export const KEY_ALIASES: Record<string, string> = {
   'indicator': 'light_switch',
   'sound_status': 'sound_switch',
   'food_outlet': 'food_outlet_state',
-  'filter_l_e_d': 'filter_led_switch',
   'device_error': 'device_stopped_working',
   'device_fault': 'device_stopped_working',
   'door_error': 'barn_door_error',
@@ -125,14 +123,33 @@ export const KEY_ALIASES: Record<string, string> = {
   'turn_off_display': 'display_off',
   'desiccant_replaced': 'desiccant_reset',
   'reposition_the_schedule': 'reposition_schedule',
+  'enable_selected_plan': 'feeding_plan_enable',
+  'disable_selected_plan': 'feeding_plan_disable',
+  'delete_selected_plan': 'feeding_plan_delete',
+  'skip_selected_plan_today': 'feeding_plan_skip_today',
+  'un_skip_selected_plan_today': 'feeding_plan_unskip_today',
+  'enable_today_s_feeding_schedule': 'feeding_plan_today_enable_all',
+  'disable_today_s_feeding_schedule': 'feeding_plan_today_disable_all',
+  'enable_feeding_schedule': 'enable_feeding_plan',
+  'disable_feeding_schedule': 'disable_feeding_plan',
+  'reset_cleaning_timer': 'reset_cleaning',
+  'reset_filter_timer': 'reset_filter',
+  'reset_mat_timer': 'reset_mat',
 
   // --- Switches ---
   'light': 'light_switch',
   'sound': 'sound_switch',
   'deodorization': 'deodorization_mode_switch',
+  'after_use_deodorization': 'after_deodorization_switch',
+  'auto_clean_in_sleep_mode': 'enable_auto_clean_in_sleep_mode',
+  'deodorize_in_sleep_mode': 'enable_deodorization_in_sleep_mode',
 
   // --- Selects ---
   'icon_to_display': 'display_icon',
+
+  // --- Numbers ---
+  'auto_clean_delay': 'auto_delay_sec',
+  'post_use_deodorization_duration': 'duration_after_deodorization',
 
   // --- Text ---
   'text_on_display': 'display_text',
@@ -169,6 +186,14 @@ export const ALL_KNOWN_KEYS = [
   'manual_lid_open',
   'enable_feeding_plan',
   'disable_feeding_plan',
+  'feeding_plan_enable',
+  'feeding_plan_disable',
+  'feeding_plan_delete',
+  'feeding_plan_skip_today',
+  'feeding_plan_unskip_today',
+  'feeding_plan_today_enable_all',
+  'feeding_plan_today_disable_all',
+  'feeding_schedule',
   'desiccant_reset',
   'desiccant_frequency',
   'desiccant_cycle',
@@ -227,7 +252,6 @@ export const ALL_KNOWN_KEYS = [
   'tank_total_ml',
   'exception_message',
   'volume_level',
-  'water_low',
   'water_state',
   'water_interval',
   'water_dispensing_duration',
@@ -238,7 +262,6 @@ export const ALL_KNOWN_KEYS = [
   'cleaning_reset',
   'filter_cycle',
   'filter_reset',
-  'filter_led_switch',
   'device_stopped_working',
   'today_drinking_amount',
   'yesterday_drinking_amount',
@@ -280,6 +303,18 @@ export const ALL_KNOWN_KEYS = [
   'trigger_open_door',
   'trigger_close_door',
   'trigger_vacuum',
+  // Litter box new entities
+  'today_potty_times',
+  'today_potty_duration',
+  'after_deodorization_switch',
+  'avoid_repeat_clean',
+  'enable_auto_clean_in_sleep_mode',
+  'enable_deodorization_in_sleep_mode',
+  'auto_delay_sec',
+  'duration_after_deodorization',
+  'reset_cleaning',
+  'reset_filter',
+  'reset_mat',
   // --- Name-based aliases (HA entity_id suffixes derived from entity names) ---
   ...Object.keys(KEY_ALIASES),
 ].sort((a, b) => b.length - a.length);
