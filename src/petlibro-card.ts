@@ -173,6 +173,7 @@ export class PetlibroCard extends LitElement {
           this._entities,
           (entityId) => this._handleButtonPress(entityId),
           (entityId) => this._handleSwitchToggle(entityId),
+          (entityId, option) => this._handleSelectChange(entityId, option),
         );
       case 'fountain':
         return renderFountainCard(
@@ -186,6 +187,8 @@ export class PetlibroCard extends LitElement {
           this._entities,
           (entityId) => this._handleButtonPress(entityId),
           (entityId) => this._handleSwitchToggle(entityId),
+          (entityId, option) => this._handleSelectChange(entityId, option),
+          (entityId, value) => this._handleNumberChange(entityId, value),
         );
       default:
         return html`<div class="unavailable">Unknown device type</div>`;
@@ -198,6 +201,14 @@ export class PetlibroCard extends LitElement {
 
   private _handleSwitchToggle(entityId: string): void {
     this.hass.callService('switch', 'toggle', { entity_id: entityId });
+  }
+
+  private _handleSelectChange(entityId: string, option: string): void {
+    this.hass.callService('select', 'select_option', { entity_id: entityId, option });
+  }
+
+  private _handleNumberChange(entityId: string, value: number): void {
+    this.hass.callService('number', 'set_value', { entity_id: entityId, value });
   }
 
   private _getDeviceTypeIcon(): string {
@@ -218,6 +229,9 @@ export class PetlibroCard extends LitElement {
       ...Object.values(this._entities.switches),
       ...Object.values(this._entities.numbers),
       ...Object.values(this._entities.selects),
+      ...Object.values(this._entities.dates),
+      ...Object.values(this._entities.images),
+      ...Object.values(this._entities.updates),
     ];
   }
 }

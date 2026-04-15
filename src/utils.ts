@@ -14,6 +14,9 @@ const DOMAIN_MAP: Record<string, keyof DeviceEntities> = {
   switch: 'switches',
   number: 'numbers',
   select: 'selects',
+  date: 'dates',
+  image: 'images',
+  update: 'updates',
 };
 
 /**
@@ -59,6 +62,9 @@ export function getDeviceEntities(hass: HomeAssistant, deviceId: string): Device
     switches: {},
     numbers: {},
     selects: {},
+    dates: {},
+    images: {},
+    updates: {},
   };
 
   if (!hass.entities) return result;

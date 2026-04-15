@@ -15,6 +15,9 @@ export interface DeviceEntities {
   switches: Record<string, string>;
   numbers: Record<string, string>;
   selects: Record<string, string>;
+  dates: Record<string, string>;
+  images: Record<string, string>;
+  updates: Record<string, string>;
 }
 
 // Minimal HA types to avoid heavy dependency on ha-frontend

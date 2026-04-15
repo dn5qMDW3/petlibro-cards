@@ -245,4 +245,103 @@ export const cardStyles = css`
   .battery-indicator.good {
     color: var(--success-color, #4caf50);
   }
+
+  /* Settings section */
+  .settings-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--divider-color, #e0e0e0);
+  }
+
+  .settings-section-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--secondary-text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .settings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: var(--secondary-background-color, #f5f5f5);
+  }
+
+  .setting-label {
+    font-size: 13px;
+    color: var(--primary-text-color);
+    flex-shrink: 0;
+  }
+
+  .setting-control {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .setting-control select {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--divider-color, #e0e0e0);
+    background: var(--card-background-color, #fff);
+    color: var(--primary-text-color);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .setting-control select:focus {
+    outline: none;
+    border-color: var(--primary-color, #03a9f4);
+  }
+
+  .number-control {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .number-control .value {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--primary-text-color);
+    min-width: 40px;
+    text-align: center;
+  }
+
+  .number-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--primary-color, #03a9f4);
+    color: var(--text-primary-color, #fff);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .number-btn:hover {
+    opacity: 0.85;
+  }
+
+  .number-btn:active {
+    opacity: 0.7;
+  }
 `;

@@ -7,6 +7,7 @@ export function renderFeederCard(
   entities: DeviceEntities,
   onButtonPress: (entityId: string) => void,
   onSwitchToggle: (entityId: string) => void,
+  onSelectChange: (entityId: string, option: string) => void,
 ): TemplateResult {
   const battery = getNumericState(hass, entities.sensors.electric_quantity);
   const foodLow = isEntityOn(hass, entities.binary_sensors.food_low);
@@ -15,17 +16,19 @@ export function renderFeederCard(
   const lastFeed = formatTime(hass, entities.sensors.last_feed_time);
   const nextFeed = formatTime(hass, entities.sensors.next_feed_time);
   const nextQty = getStateValue(hass, entities.sensors.next_feed_quantity_weight);
-  const planState = getStateValue(hass, entities.sensors.feeding_plan_state);
+  const planState = isEntityOn(hass, entities.binary_sensors.feeding_plan_state)
+    ? 'Active' : entities.binary_sensors.feeding_plan_state ? 'Inactive' : undefined;
   const todayUnit = hass.states[entities.sensors.today_feeding_quantity_weight ?? '']?.attributes?.unit_of_measurement ?? 'g';
   const nextUnit = hass.states[entities.sensors.next_feed_quantity_weight ?? '']?.attributes?.unit_of_measurement ?? 'g';
   const lightOn = isEntityOn(hass, entities.binary_sensors.light_switch);
 
   // Polar Wet Food Feeder specific
   const temperature = getStateValue(hass, entities.sensors.temperature);
+  const tempUnit = hass.states[entities.sensors.temperature ?? '']?.attributes?.unit_of_measurement ?? '°F';
   const platePosition = getStateValue(hass, entities.selects.plate_position);
   const nextFeedingTime = getStateValue(hass, entities.sensors.next_feeding_time);
   const nextFeedingEndTime = getStateValue(hass, entities.sensors.next_feeding_end_time);
-  const nextFeedingDay = getStateValue(hass, entities.sensors.next_feeding_day);
+  const nextFeedingDay = getStateValue(hass, entities.sensors.feeding_schedule);
   const cleaningDays = getNumericState(hass, entities.sensors.remaining_cleaning_days);
 
   return html`
@@ -95,7 +98,7 @@ export function renderFeederCard(
           <ha-icon class="metric-icon" icon="mdi:thermometer"></ha-icon>
           <div class="metric-content">
             <div class="metric-label">Temperature</div>
-            <div class="metric-value">${temperature}°C</div>
+            <div class="metric-value">${temperature}${tempUnit}</div>
           </div>
         </div>
       ` : nothing}
@@ -176,6 +179,60 @@ export function renderFeederCard(
         </button>
       ` : nothing}
     </div>
+
+    ${entities.selects.feeding_schedule ? html`
+      <div class="settings-section">
+        <div class="settings-section-title">Feeding Schedule</div>
+        <div class="settings-grid">
+          <div class="setting-row">
+            <span class="setting-label">Plan</span>
+            <div class="setting-control">
+              <select
+                @change=${(e: Event) => onSelectChange(
+                  entities.selects.feeding_schedule,
+                  (e.target as HTMLSelectElement).value,
+                )}
+              >
+                ${(hass.states[entities.selects.feeding_schedule]?.attributes?.options ?? []).map(
+                  (opt: string) => html`
+                    <option
+                      value=${opt}
+                      ?selected=${hass.states[entities.selects.feeding_schedule]?.state === opt}
+                    >${opt}</option>
+                  `,
+                )}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="controls-row" style="margin-top: 8px">
+          ${entities.buttons.feeding_plan_enable ? html`
+            <button class="control-button" @click=${() => onButtonPress(entities.buttons.feeding_plan_enable)}>
+              <ha-icon icon="mdi:check"></ha-icon>
+              Enable
+            </button>
+          ` : nothing}
+          ${entities.buttons.feeding_plan_disable ? html`
+            <button class="control-button secondary" @click=${() => onButtonPress(entities.buttons.feeding_plan_disable)}>
+              <ha-icon icon="mdi:close"></ha-icon>
+              Disable
+            </button>
+          ` : nothing}
+          ${entities.buttons.feeding_plan_today_enable_all ? html`
+            <button class="control-button" @click=${() => onButtonPress(entities.buttons.feeding_plan_today_enable_all)}>
+              <ha-icon icon="mdi:calendar-check"></ha-icon>
+              Enable All Today
+            </button>
+          ` : nothing}
+          ${entities.buttons.feeding_plan_today_disable_all ? html`
+            <button class="control-button secondary" @click=${() => onButtonPress(entities.buttons.feeding_plan_today_disable_all)}>
+              <ha-icon icon="mdi:calendar-remove"></ha-icon>
+              Disable All Today
+            </button>
+          ` : nothing}
+        </div>
+      </div>
+    ` : nothing}
   `;
 }
 

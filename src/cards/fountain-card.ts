@@ -9,7 +9,6 @@ export function renderFountainCard(
 ): TemplateResult {
   const battery = getNumericState(hass, entities.sensors.electric_quantity);
   const waterPercent = getNumericState(hass, entities.sensors.weight_percent);
-  const waterLow = isEntityOn(hass, entities.binary_sensors.water_low);
   const remainingWater = getStateValue(hass, entities.sensors.remaining_water);
   const remainingWaterUnit = hass.states[entities.sensors.remaining_water ?? '']?.attributes?.unit_of_measurement ?? 'mL';
   const todayDrinking = getStateValue(hass, entities.sensors.today_drinking_amount);
@@ -34,18 +33,18 @@ export function renderFountainCard(
         </div>
       ` : nothing}
 
-      <div class="metric-item ${waterLow ? 'alert' : ''}">
-        <ha-icon class="metric-icon" icon="${waterLow ? 'mdi:water-off' : 'mdi:water-percent'}"></ha-icon>
-        <div class="metric-content">
-          <div class="metric-label">Water Level</div>
-          <div class="metric-value">${waterPercent !== undefined ? `${Math.round(waterPercent)}%` : waterLow ? 'Low' : 'OK'}</div>
-          ${waterPercent !== undefined ? html`
+      ${waterPercent !== undefined ? html`
+        <div class="metric-item ${waterPercent <= 10 ? 'alert' : ''}">
+          <ha-icon class="metric-icon" icon="mdi:water-percent"></ha-icon>
+          <div class="metric-content">
+            <div class="metric-label">Water Level</div>
+            <div class="metric-value">${Math.round(waterPercent)}%</div>
             <div class="gauge-bar">
               <div class="gauge-fill ${waterGaugeClass}" style="width: ${Math.min(100, waterPercent)}%"></div>
             </div>
-          ` : nothing}
+          </div>
         </div>
-      </div>
+      ` : nothing}
 
       ${remainingWater !== undefined ? html`
         <div class="metric-item">
