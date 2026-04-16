@@ -15,6 +15,8 @@ import {
 import { renderFeederCard } from './cards/feeder-card';
 import { renderFountainCard } from './cards/fountain-card';
 import { renderLitterBoxCard } from './cards/litter-box-card';
+import { tokens } from './tokens';
+import './components';
 
 console.info(`%c PETLIBRO-CARD %c v${CARD_VERSION} `, 'color: white; background: #3498db; font-weight: bold;', 'color: #3498db; background: white; font-weight: bold;');
 
@@ -46,7 +48,7 @@ export class PetlibroCard extends LitElement {
   @state() private _entities?: DeviceEntities;
   @state() private _primaryEntityId?: string;
 
-  static styles = cardStyles;
+  static styles = [tokens, cardStyles];
 
   public static async getConfigElement(): Promise<HTMLElement> {
     await import('./editor');
@@ -148,30 +150,19 @@ export class PetlibroCard extends LitElement {
 
   private _renderHeader(): TemplateResult {
     const name = this._config.name || getDeviceName(this.hass, this._deviceId!) || 'PetLibro Device';
-    // Use cached primary entity for image lookup
     const representativeEntity = this._primaryEntityId ?? '';
     const imageUrl = getDeviceImage(this.hass, representativeEntity, this._deviceId!);
     const online = isEntityOn(this.hass, this._entities!.binary_sensors.online);
     const model = this.hass.devices?.[this._deviceId!]?.model;
 
     return html`
-      <div class="card-header">
-        ${imageUrl
-          ? html`<img class="device-image" src="${imageUrl}" alt="${name}" />`
-          : html`
-            <div class="device-image-placeholder">
-              <ha-icon icon="${this._getDeviceTypeIcon()}"></ha-icon>
-            </div>
-          `}
-        <div class="header-info">
-          <div class="device-name">${name}</div>
-          ${model ? html`<div class="device-model">${model}</div>` : nothing}
-        </div>
-        <div class="status-badge">
-          <div class="status-dot ${online ? 'online' : 'offline'}"></div>
-          <span class="status-text">${online ? 'Online' : 'Offline'}</span>
-        </div>
-      </div>
+      <petlibro-card-header
+        .image=${imageUrl ?? undefined}
+        .name=${name}
+        .model=${model ?? undefined}
+        ?online=${online}
+        .fallbackIcon=${this._getDeviceTypeIcon()}
+      ></petlibro-card-header>
     `;
   }
 
