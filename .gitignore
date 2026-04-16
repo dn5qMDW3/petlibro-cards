@@ -15,6 +15,7 @@ node_modules/
 
 # Claude
 CLAUDE.md
+docs/superpowers/
 
 # Environment
 .env
