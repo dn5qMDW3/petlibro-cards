@@ -28,14 +28,14 @@ export interface HomeAssistant {
   callService: (
     domain: string,
     service: string,
-    data?: Record<string, any>,
+    data?: Record<string, unknown>,
   ) => Promise<void>;
 }
 
 export interface HassState {
   entity_id: string;
   state: string;
-  attributes: Record<string, any>;
+  attributes: Record<string, unknown>;
   last_changed: string;
   last_updated: string;
 }
@@ -48,8 +48,9 @@ export interface HassEntityRegistryEntry {
 
 export interface HassDeviceRegistryEntry {
   id: string;
-  name?: string;
+  name?: string | null;
+  name_by_user?: string | null;
   configuration_url?: string;
-  manufacturer?: string;
-  model?: string;
+  manufacturer?: string | null;
+  model?: string | null;
 }

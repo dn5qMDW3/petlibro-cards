@@ -18,9 +18,19 @@ import { renderLitterBoxCard } from './cards/litter-box-card';
 
 console.info(`%c PETLIBRO-CARD %c v${CARD_VERSION} `, 'color: white; background: #3498db; font-weight: bold;', 'color: #3498db; background: white; font-weight: bold;');
 
-// Register card in HA's card picker
-(window as any).customCards = (window as any).customCards || [];
-(window as any).customCards.push({
+// Register card in HA's card picker. `customCards` is a global HA-defined array
+// not exposed in our local types, so we cast through unknown.
+interface CustomCardsWindow extends Window {
+  customCards?: Array<{
+    type: string;
+    name: string;
+    description: string;
+    preview?: boolean;
+  }>;
+}
+const w = window as CustomCardsWindow;
+w.customCards = w.customCards ?? [];
+w.customCards.push({
   type: CARD_NAME,
   name: 'Petlibro Card',
   description: 'Auto-detecting card for PetLibro feeders, fountains, and litter boxes',
@@ -34,6 +44,7 @@ export class PetlibroCard extends LitElement {
   @state() private _deviceId?: string;
   @state() private _deviceType?: DeviceType;
   @state() private _entities?: DeviceEntities;
+  @state() private _primaryEntityId?: string;
 
   static styles = cardStyles;
 
@@ -89,6 +100,8 @@ export class PetlibroCard extends LitElement {
         this._deviceId = deviceId;
         this._entities = getDeviceEntities(this.hass, deviceId);
         this._deviceType = detectDeviceType(this._entities);
+        // Cache the primary entity ID once — getFirstEntityId is O(n) over the entity registry.
+        this._primaryEntityId = this._config.entity || getFirstEntityId(this.hass, deviceId) || '';
       }
     }
   }
@@ -111,7 +124,7 @@ export class PetlibroCard extends LitElement {
     }
 
     // Check if primary entity is unavailable
-    const primaryEntityId = this._config.entity || getFirstEntityId(this.hass, this._deviceId!) || '';
+    const primaryEntityId = this._primaryEntityId ?? '';
     const primaryState = this.hass.states[primaryEntityId]?.state;
     if (primaryState === 'unavailable') {
       return html`
@@ -135,11 +148,10 @@ export class PetlibroCard extends LitElement {
 
   private _renderHeader(): TemplateResult {
     const name = this._config.name || getDeviceName(this.hass, this._deviceId!) || 'PetLibro Device';
-    // Use configured entity or find any entity from the device for image lookup
-    const representativeEntity = this._config.entity || getFirstEntityId(this.hass, this._deviceId!) || '';
+    // Use cached primary entity for image lookup
+    const representativeEntity = this._primaryEntityId ?? '';
     const imageUrl = getDeviceImage(this.hass, representativeEntity, this._deviceId!);
-    // online entity may be keyed as "online" (from integration key) or "wi_fi" (from HA entity name)
-    const online = isEntityOn(this.hass, this._entities!.binary_sensors.online ?? this._entities!.binary_sensors.wi_fi);
+    const online = isEntityOn(this.hass, this._entities!.binary_sensors.online);
     const model = this.hass.devices?.[this._deviceId!]?.model;
 
     return html`
@@ -166,6 +178,8 @@ export class PetlibroCard extends LitElement {
   private _renderDeviceContent(): TemplateResult | typeof nothing {
     if (!this._entities) return nothing;
 
+    const showControls = this._config.show_controls ?? true;
+
     switch (this._deviceType) {
       case 'feeder':
         return renderFeederCard(
@@ -174,12 +188,14 @@ export class PetlibroCard extends LitElement {
           (entityId) => this._handleButtonPress(entityId),
           (entityId) => this._handleSwitchToggle(entityId),
           (entityId, option) => this._handleSelectChange(entityId, option),
+          showControls,
         );
       case 'fountain':
         return renderFountainCard(
           this.hass,
           this._entities,
           (entityId) => this._handleButtonPress(entityId),
+          showControls,
         );
       case 'litter_box':
         return renderLitterBoxCard(
@@ -189,6 +205,7 @@ export class PetlibroCard extends LitElement {
           (entityId) => this._handleSwitchToggle(entityId),
           (entityId, option) => this._handleSelectChange(entityId, option),
           (entityId, value) => this._handleNumberChange(entityId, value),
+          showControls,
         );
       default:
         return html`<div class="unavailable">Unknown device type</div>`;

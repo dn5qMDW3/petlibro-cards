@@ -1,6 +1,6 @@
 {
   "name": "petlibro-cards",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Custom Home Assistant Lovelace card for PetLibro devices",
   "type": "module",
   "main": "dist/petlibro-cards.js",
@@ -15,12 +15,13 @@
     "lit": "^3.2.0"
   },
   "devDependencies": {
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.0",
-    "eslint": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
     "home-assistant-js-websocket": "^9.4.0",
     "prettier": "^3.4.0",
     "rollup": "^4.28.0",

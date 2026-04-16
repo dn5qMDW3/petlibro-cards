@@ -65,17 +65,16 @@ export class PetlibroCardEditor extends LitElement {
     // Find all device_ids that have at least one petlibro entity
     const petlibroDeviceIds = new Set<string>();
     for (const entry of Object.values(this.hass.entities)) {
-      const e = entry as any;
-      if (e.platform === 'petlibro' && e.device_id) {
-        petlibroDeviceIds.add(e.device_id);
+      if (entry.platform === 'petlibro' && entry.device_id) {
+        petlibroDeviceIds.add(entry.device_id);
       }
     }
 
     // Build device list with names
     const devices: PetlibroDevice[] = [];
     for (const deviceId of petlibroDeviceIds) {
-      const device = (this.hass.devices as any)[deviceId];
-      const name = device?.name || device?.name_by_user || `Device ${deviceId.slice(0, 8)}`;
+      const device = this.hass.devices[deviceId];
+      const name = device?.name_by_user || device?.name || `Device ${deviceId.slice(0, 8)}`;
       devices.push({ id: deviceId, name });
     }
 

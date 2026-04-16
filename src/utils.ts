@@ -79,9 +79,8 @@ export function getDeviceEntities(hass: HomeAssistant, deviceId: string): Device
     const key = extractKeySuffix(entityId);
     if (key) {
       result[group][key] = entityId;
-    } else {
-      console.debug(`[petlibro-card] Unrecognized entity suffix: ${entityId}`);
     }
+    // Silently skip unrecognized suffixes — other integrations may share the device.
   }
 
   return result;
@@ -169,14 +168,14 @@ export function getDeviceImage(
 ): string | undefined {
   // Try entity_picture on the representative entity first
   const picture = hass.states[entityId]?.attributes?.entity_picture;
-  if (picture) return picture;
+  if (typeof picture === 'string' && picture) return picture;
 
-  // Scan all entities for one with entity_picture (dev-rebase-v2 sets it per-entity)
+  // Scan all entities for one with entity_picture (set per-entity by the integration)
   if (hass.entities) {
     for (const [eid, entry] of Object.entries(hass.entities)) {
       if (entry.device_id !== deviceId) continue;
       const ep = hass.states[eid]?.attributes?.entity_picture;
-      if (ep) return ep;
+      if (typeof ep === 'string' && ep) return ep;
     }
   }
 
@@ -208,4 +207,14 @@ export function formatTime(hass: HomeAssistant, entityId: string | undefined): s
   } catch {
     return val;
   }
+}
+
+/** Return the appropriate MDI battery icon for a given battery percentage. */
+export function getBatteryIcon(level: number): string {
+  if (level >= 90) return 'mdi:battery';
+  if (level >= 70) return 'mdi:battery-70';
+  if (level >= 50) return 'mdi:battery-50';
+  if (level >= 30) return 'mdi:battery-30';
+  if (level >= 10) return 'mdi:battery-10';
+  return 'mdi:battery-alert';
 }

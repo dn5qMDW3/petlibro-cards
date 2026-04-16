@@ -1,6 +1,7 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import type { DeviceEntities, HomeAssistant } from '../types';
-import { formatTime, getNumericState, getStateValue, isEntityOn } from '../utils';
+import { formatTime, getBatteryIcon, getNumericState, getStateValue, isEntityOn } from '../utils';
+import { renderLightToggleButton, renderMetricItem, renderSelectRow } from './shared';
 
 export function renderFeederCard(
   hass: HomeAssistant,
@@ -8,6 +9,7 @@ export function renderFeederCard(
   onButtonPress: (entityId: string) => void,
   onSwitchToggle: (entityId: string) => void,
   onSelectChange: (entityId: string, option: string) => void,
+  showControls: boolean = true,
 ): TemplateResult {
   const battery = getNumericState(hass, entities.sensors.electric_quantity);
   const foodLow = isEntityOn(hass, entities.binary_sensors.food_low);
@@ -25,107 +27,53 @@ export function renderFeederCard(
   // Polar Wet Food Feeder specific
   const temperature = getStateValue(hass, entities.sensors.temperature);
   const tempUnit = hass.states[entities.sensors.temperature ?? '']?.attributes?.unit_of_measurement ?? '°F';
-  const platePosition = getStateValue(hass, entities.selects.plate_position);
+  const platePosition = getStateValue(hass, entities.sensors.plate_position);
   const nextFeedingTime = getStateValue(hass, entities.sensors.next_feeding_time);
   const nextFeedingEndTime = getStateValue(hass, entities.sensors.next_feeding_end_time);
   const nextFeedingDay = getStateValue(hass, entities.sensors.next_feeding_day);
 
   return html`
     <div class="metrics-grid">
-      ${battery !== undefined ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="${getBatteryIcon(battery)}"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Battery</div>
-            <div class="metric-value">${Math.round(battery)}%</div>
-          </div>
-        </div>
-      ` : nothing}
+      ${battery !== undefined ? renderMetricItem(getBatteryIcon(battery), 'Battery', `${Math.round(battery)}%`) : nothing}
 
-      <div class="metric-item ${foodLow ? 'alert' : ''}">
-        <ha-icon class="metric-icon" icon="${foodLow ? 'mdi:bowl-mix-outline' : 'mdi:bowl-outline'}"></ha-icon>
-        <div class="metric-content">
-          <div class="metric-label">Food Status</div>
-          <div class="metric-value">${foodLow ? 'Low' : 'OK'}</div>
-        </div>
-      </div>
+      ${renderMetricItem(
+        foodLow ? 'mdi:bowl-mix-outline' : 'mdi:bowl-outline',
+        'Food Status',
+        foodLow ? 'Low' : 'OK',
+        foodLow ? 'alert' : '',
+      )}
 
-      ${todayQty !== undefined ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="mdi:scale"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Fed Today</div>
-            <div class="metric-value">${todayQty} ${todayUnit}${todayTimes ? ` (${todayTimes}x)` : ''}</div>
-          </div>
-        </div>
-      ` : nothing}
+      ${todayQty !== undefined ? renderMetricItem(
+        'mdi:scale',
+        'Fed Today',
+        `${todayQty} ${todayUnit}${todayTimes ? ` (${todayTimes}x)` : ''}`,
+      ) : nothing}
 
-      ${lastFeed ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="mdi:history"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Last Feed</div>
-            <div class="metric-value">${lastFeed}</div>
-          </div>
-        </div>
-      ` : nothing}
+      ${lastFeed ? renderMetricItem('mdi:history', 'Last Feed', lastFeed) : nothing}
 
-      ${nextFeed ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="mdi:calendar-arrow-right"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Next Feed</div>
-            <div class="metric-value">${nextFeed}${nextQty ? ` (${nextQty} ${nextUnit})` : ''}</div>
-          </div>
-        </div>
-      ` : nothing}
+      ${nextFeed ? renderMetricItem(
+        'mdi:calendar-arrow-right',
+        'Next Feed',
+        `${nextFeed}${nextQty ? ` (${nextQty} ${nextUnit})` : ''}`,
+      ) : nothing}
 
-      ${planState !== undefined ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="mdi:calendar-check"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Feeding Plan</div>
-            <div class="metric-value">${planState}</div>
-          </div>
-        </div>
-      ` : nothing}
+      ${planState !== undefined ? renderMetricItem('mdi:calendar-check', 'Feeding Plan', planState) : nothing}
 
       ${/* Polar Wet Food Feeder metrics */ ''}
 
-      ${temperature !== undefined ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="mdi:thermometer"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Temperature</div>
-            <div class="metric-value">${temperature}${tempUnit}</div>
-          </div>
-        </div>
-      ` : nothing}
+      ${temperature !== undefined ? renderMetricItem('mdi:thermometer', 'Temperature', `${temperature}${tempUnit}`) : nothing}
 
-      ${platePosition !== undefined ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="mdi:rotate-3d-variant"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Plate Position</div>
-            <div class="metric-value">${platePosition}</div>
-          </div>
-        </div>
-      ` : nothing}
+      ${platePosition !== undefined ? renderMetricItem('mdi:rotate-3d-variant', 'Plate Position', platePosition) : nothing}
 
-      ${nextFeedingTime !== undefined ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="mdi:clock-outline"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Next Feeding</div>
-            <div class="metric-value">
-              ${nextFeedingDay ? `${nextFeedingDay} ` : ''}${nextFeedingTime}${nextFeedingEndTime ? ` – ${nextFeedingEndTime}` : ''}
-            </div>
-          </div>
-        </div>
-      ` : nothing}
+      ${nextFeedingTime !== undefined ? renderMetricItem(
+        'mdi:clock-outline',
+        'Next Feeding',
+        `${nextFeedingDay ? `${nextFeedingDay} ` : ''}${nextFeedingTime}${nextFeedingEndTime ? ` – ${nextFeedingEndTime}` : ''}`,
+      ) : nothing}
 
     </div>
 
+    ${showControls ? html`
     <div class="controls-row">
       ${entities.buttons.manual_feed ? html`
         <button class="control-button" @click=${() => onButtonPress(entities.buttons.manual_feed)}>
@@ -159,41 +107,14 @@ export function renderFeederCard(
         </button>
       ` : nothing}
 
-      ${entities.buttons.light_on || entities.buttons.light_off ? html`
-        <button
-          class="control-button ${lightOn ? 'active' : 'secondary'}"
-          @click=${() => onButtonPress(lightOn ? entities.buttons.light_off : entities.buttons.light_on)}
-        >
-          <ha-icon icon="mdi:lightbulb${lightOn ? '' : '-outline'}"></ha-icon>
-          Light
-        </button>
-      ` : nothing}
+      ${renderLightToggleButton(entities, lightOn, onButtonPress)}
     </div>
 
     ${entities.selects.feeding_plan_select ? html`
       <div class="settings-section">
         <div class="settings-section-title">Feeding Schedule</div>
         <div class="settings-grid">
-          <div class="setting-row">
-            <span class="setting-label">Plan</span>
-            <div class="setting-control">
-              <select
-                @change=${(e: Event) => onSelectChange(
-                  entities.selects.feeding_plan_select,
-                  (e.target as HTMLSelectElement).value,
-                )}
-              >
-                ${(hass.states[entities.selects.feeding_plan_select]?.attributes?.options ?? []).map(
-                  (opt: string) => html`
-                    <option
-                      value=${opt}
-                      ?selected=${hass.states[entities.selects.feeding_plan_select]?.state === opt}
-                    >${opt}</option>
-                  `,
-                )}
-              </select>
-            </div>
-          </div>
+          ${renderSelectRow(hass, entities.selects.feeding_plan_select, 'Plan', onSelectChange)}
         </div>
         <div class="controls-row" style="margin-top: 8px">
           ${entities.buttons.feeding_plan_enable ? html`
@@ -223,14 +144,6 @@ export function renderFeederCard(
         </div>
       </div>
     ` : nothing}
+    ` : nothing}
   `;
-}
-
-function getBatteryIcon(level: number): string {
-  if (level >= 90) return 'mdi:battery';
-  if (level >= 70) return 'mdi:battery-70';
-  if (level >= 50) return 'mdi:battery-50';
-  if (level >= 30) return 'mdi:battery-30';
-  if (level >= 10) return 'mdi:battery-10';
-  return 'mdi:battery-alert';
 }

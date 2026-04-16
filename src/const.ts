@@ -1,4 +1,6 @@
-export const CARD_VERSION = '0.5.0';
+import packageJson from '../package.json';
+
+export const CARD_VERSION = packageJson.version;
 export const CARD_NAME = 'petlibro-card';
 export const EDITOR_NAME = 'petlibro-card-editor';
 

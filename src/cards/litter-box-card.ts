@@ -1,6 +1,7 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import type { DeviceEntities, HomeAssistant } from '../types';
-import { getNumericState, getStateValue, isEntityOn } from '../utils';
+import { getBatteryIcon, getNumericState, getStateValue, isEntityOn } from '../utils';
+import { renderGaugeMetric, renderMetricItem, renderNumberStepper, renderSelectRow } from './shared';
 
 export function renderLitterBoxCard(
   hass: HomeAssistant,
@@ -9,6 +10,7 @@ export function renderLitterBoxCard(
   onSwitchToggle: (entityId: string) => void,
   onSelectChange: (entityId: string, option: string) => void,
   onNumberChange: (entityId: string, value: number) => void,
+  showControls: boolean = true,
 ): TemplateResult {
   const battery = getNumericState(hass, entities.sensors.electric_quantity);
   const litterPercent = getNumericState(hass, entities.sensors.weight_percent);
@@ -27,78 +29,42 @@ export function renderLitterBoxCard(
 
   return html`
     <div class="metrics-grid">
-      ${battery !== undefined ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="${getBatteryIcon(battery)}"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Battery</div>
-            <div class="metric-value">${Math.round(battery)}%</div>
-          </div>
-        </div>
-      ` : nothing}
+      ${battery !== undefined ? renderMetricItem(getBatteryIcon(battery), 'Battery', `${Math.round(battery)}%`) : nothing}
 
-      ${litterPercent !== undefined ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="mdi:gauge"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Litter Level</div>
-            <div class="metric-value">${Math.round(litterPercent)}%</div>
-            <div class="gauge-bar">
-              <div class="gauge-fill ${litterGaugeClass}" style="width: ${Math.min(100, litterPercent)}%"></div>
-            </div>
-          </div>
-        </div>
-      ` : nothing}
+      ${litterPercent !== undefined ? renderGaugeMetric(
+        'mdi:gauge',
+        'Litter Level',
+        `${Math.round(litterPercent)}%`,
+        litterPercent,
+        litterGaugeClass,
+      ) : nothing}
 
-      <div class="metric-item ${wasteFull ? 'alert' : ''}">
-        <ha-icon class="metric-icon" icon="${wasteFull ? 'mdi:delete-alert' : 'mdi:delete-variant'}"></ha-icon>
-        <div class="metric-content">
-          <div class="metric-label">Waste Bin</div>
-          <div class="metric-value">${wasteFull ? 'Full' : 'OK'}</div>
-        </div>
-      </div>
+      ${renderMetricItem(
+        wasteFull ? 'mdi:delete-alert' : 'mdi:delete-variant',
+        'Waste Bin',
+        wasteFull ? 'Full' : 'OK',
+        wasteFull ? 'alert' : '',
+      )}
 
-      ${runningState !== undefined ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="mdi:state-machine"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Status</div>
-            <div class="metric-value">${runningState}</div>
-          </div>
-        </div>
-      ` : nothing}
+      ${runningState !== undefined ? renderMetricItem('mdi:state-machine', 'Status', runningState) : nothing}
 
-      ${cleaningDays !== undefined ? html`
-        <div class="metric-item ${Number(cleaningDays) <= 1 ? 'alert' : ''}">
-          <ha-icon class="metric-icon" icon="mdi:broom"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Cleaning Due</div>
-            <div class="metric-value">${cleaningDays} days</div>
-          </div>
-        </div>
-      ` : nothing}
+      ${cleaningDays !== undefined ? renderMetricItem(
+        'mdi:broom',
+        'Cleaning Due',
+        `${cleaningDays} days`,
+        Number(cleaningDays) <= 1 ? 'alert' : '',
+      ) : nothing}
 
-      ${pottyTimes !== undefined ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="mdi:counter"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Potty Today</div>
-            <div class="metric-value">${pottyTimes}x${pottyDuration ? ` (${pottyDuration}s)` : ''}</div>
-          </div>
-        </div>
-      ` : nothing}
+      ${pottyTimes !== undefined ? renderMetricItem(
+        'mdi:counter',
+        'Potty Today',
+        `${pottyTimes}x${pottyDuration ? ` (${pottyDuration}s)` : ''}`,
+      ) : nothing}
 
-      ${deodorMode !== undefined ? html`
-        <div class="metric-item">
-          <ha-icon class="metric-icon" icon="mdi:air-purifier"></ha-icon>
-          <div class="metric-content">
-            <div class="metric-label">Deodorization</div>
-            <div class="metric-value">${deodorMode}</div>
-          </div>
-        </div>
-      ` : nothing}
+      ${deodorMode !== undefined ? renderMetricItem('mdi:air-purifier', 'Deodorization', deodorMode) : nothing}
     </div>
 
+    ${showControls ? html`
     <div class="controls-row">
       ${entities.buttons.trigger_clean ? html`
         <button class="control-button" @click=${() => onButtonPress(entities.buttons.trigger_clean)}>
@@ -201,110 +167,14 @@ export function renderLitterBoxCard(
       <div class="settings-section">
         <div class="settings-section-title">Settings</div>
         <div class="settings-grid">
-          ${entities.selects.clean_mode ? html`
-            <div class="setting-row">
-              <span class="setting-label">Clean Mode</span>
-              <div class="setting-control">
-                <select
-                  @change=${(e: Event) => onSelectChange(
-                    entities.selects.clean_mode,
-                    (e.target as HTMLSelectElement).value,
-                  )}
-                >
-                  ${(hass.states[entities.selects.clean_mode]?.attributes?.options ?? []).map(
-                    (opt: string) => html`
-                      <option value=${opt} ?selected=${hass.states[entities.selects.clean_mode]?.state === opt}>${opt}</option>
-                    `,
-                  )}
-                </select>
-              </div>
-            </div>
-          ` : nothing}
-
-          ${entities.selects.deodorization_wind_speed ? html`
-            <div class="setting-row">
-              <span class="setting-label">Wind Speed</span>
-              <div class="setting-control">
-                <select
-                  @change=${(e: Event) => onSelectChange(
-                    entities.selects.deodorization_wind_speed,
-                    (e.target as HTMLSelectElement).value,
-                  )}
-                >
-                  ${(hass.states[entities.selects.deodorization_wind_speed]?.attributes?.options ?? []).map(
-                    (opt: string) => html`
-                      <option value=${opt} ?selected=${hass.states[entities.selects.deodorization_wind_speed]?.state === opt}>${opt}</option>
-                    `,
-                  )}
-                </select>
-              </div>
-            </div>
-          ` : nothing}
-
-          ${entities.numbers.volume ? (() => {
-            const attrs = hass.states[entities.numbers.volume]?.attributes ?? {};
-            const current = Number(hass.states[entities.numbers.volume]?.state ?? 0);
-            const min = Number(attrs.min ?? 0);
-            const max = Number(attrs.max ?? 100);
-            const step = Number(attrs.step ?? 10);
-            return html`
-              <div class="setting-row">
-                <span class="setting-label">Volume</span>
-                <div class="number-control">
-                  <button class="number-btn" @click=${() => onNumberChange(entities.numbers.volume, Math.max(min, current - step))}>−</button>
-                  <span class="value">${current}%</span>
-                  <button class="number-btn" @click=${() => onNumberChange(entities.numbers.volume, Math.min(max, current + step))}>+</button>
-                </div>
-              </div>
-            `;
-          })() : nothing}
-
-          ${entities.numbers.auto_delay_sec ? (() => {
-            const attrs = hass.states[entities.numbers.auto_delay_sec]?.attributes ?? {};
-            const current = Number(hass.states[entities.numbers.auto_delay_sec]?.state ?? 0);
-            const min = Number(attrs.min ?? 10);
-            const max = Number(attrs.max ?? 600);
-            const step = Number(attrs.step ?? 10);
-            return html`
-              <div class="setting-row">
-                <span class="setting-label">Clean Delay</span>
-                <div class="number-control">
-                  <button class="number-btn" @click=${() => onNumberChange(entities.numbers.auto_delay_sec, Math.max(min, current - step))}>−</button>
-                  <span class="value">${current}s</span>
-                  <button class="number-btn" @click=${() => onNumberChange(entities.numbers.auto_delay_sec, Math.min(max, current + step))}>+</button>
-                </div>
-              </div>
-            `;
-          })() : nothing}
-
-          ${entities.numbers.duration_after_deodorization ? (() => {
-            const attrs = hass.states[entities.numbers.duration_after_deodorization]?.attributes ?? {};
-            const current = Number(hass.states[entities.numbers.duration_after_deodorization]?.state ?? 0);
-            const min = Number(attrs.min ?? 1);
-            const max = Number(attrs.max ?? 30);
-            const step = Number(attrs.step ?? 1);
-            return html`
-              <div class="setting-row">
-                <span class="setting-label">Deodorize Time</span>
-                <div class="number-control">
-                  <button class="number-btn" @click=${() => onNumberChange(entities.numbers.duration_after_deodorization, Math.max(min, current - step))}>−</button>
-                  <span class="value">${current}m</span>
-                  <button class="number-btn" @click=${() => onNumberChange(entities.numbers.duration_after_deodorization, Math.min(max, current + step))}>+</button>
-                </div>
-              </div>
-            `;
-          })() : nothing}
+          ${renderSelectRow(hass, entities.selects.clean_mode, 'Clean Mode', onSelectChange)}
+          ${renderSelectRow(hass, entities.selects.deodorization_wind_speed, 'Wind Speed', onSelectChange)}
+          ${renderNumberStepper(hass, entities.numbers.volume, 'Volume', '%', onNumberChange, 10)}
+          ${renderNumberStepper(hass, entities.numbers.auto_delay_sec, 'Clean Delay', 's', onNumberChange, 10)}
+          ${renderNumberStepper(hass, entities.numbers.duration_after_deodorization, 'Deodorize Time', 'm', onNumberChange)}
         </div>
       </div>
     ` : nothing}
+    ` : nothing}
   `;
-}
-
-function getBatteryIcon(level: number): string {
-  if (level >= 90) return 'mdi:battery';
-  if (level >= 70) return 'mdi:battery-70';
-  if (level >= 50) return 'mdi:battery-50';
-  if (level >= 30) return 'mdi:battery-30';
-  if (level >= 10) return 'mdi:battery-10';
-  return 'mdi:battery-alert';
 }

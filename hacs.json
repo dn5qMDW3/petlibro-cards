@@ -1,5 +1,6 @@
 {
   "name": "Petlibro Cards",
   "render_readme": true,
-  "filename": "petlibro-cards.js"
+  "filename": "petlibro-cards.js",
+  "content_in_root": false
 }
