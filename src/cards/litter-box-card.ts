@@ -1,7 +1,7 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import type { DeviceEntities, HomeAssistant } from '../types';
 import { getBatteryIcon, getNumericState, getStateValue, isEntityOn } from '../utils';
-import { renderGaugeMetric, renderMetricItem, renderNumberStepper, renderSelectRow } from './shared';
+import { renderNumberStepper, renderSelectRow } from './shared';
 
 export function renderLitterBoxCard(
   hass: HomeAssistant,
@@ -23,158 +23,189 @@ export function renderLitterBoxCard(
   const pottyTimes = getStateValue(hass, entities.sensors.today_potty_times);
   const pottyDuration = getStateValue(hass, entities.sensors.today_potty_duration);
 
-  const litterGaugeClass = litterPercent !== undefined
-    ? litterPercent <= 15 ? 'error' : litterPercent <= 30 ? 'warning' : ''
-    : '';
+  const batteryColor = battery === undefined ? 'default' : battery <= 20 ? 'red' : battery <= 50 ? 'amber' : 'green';
+  const litterVariant = litterPercent === undefined
+    ? 'ok'
+    : litterPercent <= 15 ? 'alert' : litterPercent <= 30 ? 'warn' : 'ok';
+
+  const hasAlertChips = wasteFull;
+
+  const hasSettings = !!(
+    entities.selects.clean_mode ||
+    entities.selects.deodorization_wind_speed ||
+    entities.numbers.volume ||
+    entities.numbers.auto_delay_sec ||
+    entities.numbers.duration_after_deodorization
+  );
 
   return html`
-    <div class="metrics-grid">
-      ${battery !== undefined ? renderMetricItem(getBatteryIcon(battery), 'Battery', `${Math.round(battery)}%`) : nothing}
+    ${hasAlertChips ? html`
+      <div class="chip-row">
+        ${wasteFull ? html`<petlibro-chip icon="mdi:delete-alert" variant="alert">Bin Full</petlibro-chip>` : nothing}
+      </div>
+    ` : nothing}
 
-      ${litterPercent !== undefined ? renderGaugeMetric(
-        'mdi:gauge',
-        'Litter Level',
-        `${Math.round(litterPercent)}%`,
-        litterPercent,
-        litterGaugeClass,
-      ) : nothing}
+    <div class="tile-grid">
+      ${battery !== undefined ? html`
+        <petlibro-tile
+          .icon=${getBatteryIcon(battery)}
+          .color=${batteryColor}
+          label="Battery"
+          value="${Math.round(battery)}%"
+        ></petlibro-tile>
+      ` : nothing}
 
-      ${renderMetricItem(
-        wasteFull ? 'mdi:delete-alert' : 'mdi:delete-variant',
-        'Waste Bin',
-        wasteFull ? 'Full' : 'OK',
-        wasteFull ? 'alert' : '',
-      )}
+      ${litterPercent !== undefined ? html`
+        <petlibro-tile
+          icon="mdi:gauge"
+          color="purple"
+          label="Litter Level"
+          value="${Math.round(litterPercent)}%"
+          .progress=${litterPercent}
+          progress-variant=${litterVariant}
+        ></petlibro-tile>
+      ` : nothing}
 
-      ${runningState !== undefined ? renderMetricItem('mdi:state-machine', 'Status', runningState) : nothing}
+      <petlibro-tile
+        icon=${wasteFull ? 'mdi:delete-alert' : 'mdi:delete-variant'}
+        color=${wasteFull ? 'red' : 'green'}
+        label="Waste Bin"
+        value=${wasteFull ? 'Full' : 'OK'}
+      ></petlibro-tile>
 
-      ${cleaningDays !== undefined ? renderMetricItem(
-        'mdi:broom',
-        'Cleaning Due',
-        `${cleaningDays} days`,
-        Number(cleaningDays) <= 1 ? 'alert' : '',
-      ) : nothing}
+      ${runningState !== undefined ? html`
+        <petlibro-tile
+          icon="mdi:state-machine"
+          color="blue"
+          label="Status"
+          value=${String(runningState)}
+        ></petlibro-tile>
+      ` : nothing}
 
-      ${pottyTimes !== undefined ? renderMetricItem(
-        'mdi:counter',
-        'Potty Today',
-        `${pottyTimes}x${pottyDuration ? ` (${pottyDuration}s)` : ''}`,
-      ) : nothing}
+      ${cleaningDays !== undefined ? html`
+        <petlibro-tile
+          icon="mdi:broom"
+          .color=${Number(cleaningDays) <= 1 ? 'red' : 'amber'}
+          label="Cleaning Due"
+          value="${cleaningDays} days"
+        ></petlibro-tile>
+      ` : nothing}
 
-      ${deodorMode !== undefined ? renderMetricItem('mdi:air-purifier', 'Deodorization', deodorMode) : nothing}
+      ${pottyTimes !== undefined ? html`
+        <petlibro-tile
+          icon="mdi:counter"
+          color="pink"
+          label="Potty Today"
+          value="${pottyTimes}x${pottyDuration ? ` (${pottyDuration}s)` : ''}"
+        ></petlibro-tile>
+      ` : nothing}
+
+      ${deodorMode !== undefined ? html`
+        <petlibro-tile
+          icon="mdi:air-purifier"
+          color="green"
+          label="Deodorization"
+          value=${String(deodorMode)}
+        ></petlibro-tile>
+      ` : nothing}
     </div>
 
     ${showControls ? html`
-    <div class="controls-row">
-      ${entities.buttons.trigger_clean ? html`
-        <button class="control-button" @click=${() => onButtonPress(entities.buttons.trigger_clean)}>
-          <ha-icon icon="mdi:broom"></ha-icon>
-          Clean
-        </button>
-      ` : nothing}
+      <div class="chip-controls">
+        ${entities.buttons.trigger_clean ? html`
+          <petlibro-pill-button
+            icon="mdi:broom"
+            variant="primary"
+            @click=${() => onButtonPress(entities.buttons.trigger_clean)}
+          >Clean</petlibro-pill-button>
+        ` : nothing}
 
-      ${entities.buttons.trigger_stop_action ? html`
-        <button class="control-button secondary" @click=${() => onButtonPress(entities.buttons.trigger_stop_action)}>
-          <ha-icon icon="mdi:stop"></ha-icon>
-          Stop
-        </button>
-      ` : nothing}
+        ${entities.buttons.trigger_stop_action ? html`
+          <petlibro-pill-button
+            icon="mdi:stop"
+            @click=${() => onButtonPress(entities.buttons.trigger_stop_action)}
+          >Stop</petlibro-pill-button>
+        ` : nothing}
 
-      ${entities.switches.light_switch ? html`
-        <button
-          class="control-button ${lightOn ? 'active' : 'secondary'}"
-          @click=${() => onSwitchToggle(entities.switches.light_switch)}
-        >
-          <ha-icon icon="mdi:lightbulb${lightOn ? '' : '-outline'}"></ha-icon>
-          Light
-        </button>
-      ` : nothing}
+        ${entities.switches.light_switch ? html`
+          <petlibro-pill-button
+            icon="mdi:lightbulb${lightOn ? '' : '-outline'}"
+            ?active=${lightOn}
+            @click=${() => onSwitchToggle(entities.switches.light_switch)}
+          >Light</petlibro-pill-button>
+        ` : nothing}
 
-      ${entities.switches.sound_switch ? html`
-        <button
-          class="control-button ${soundOn ? 'active' : 'secondary'}"
-          @click=${() => onSwitchToggle(entities.switches.sound_switch)}
-        >
-          <ha-icon icon="mdi:volume-${soundOn ? 'high' : 'off'}"></ha-icon>
-          Sound
-        </button>
-      ` : nothing}
+        ${entities.switches.sound_switch ? html`
+          <petlibro-pill-button
+            icon="mdi:volume-${soundOn ? 'high' : 'off'}"
+            ?active=${soundOn}
+            @click=${() => onSwitchToggle(entities.switches.sound_switch)}
+          >Sound</petlibro-pill-button>
+        ` : nothing}
 
-      ${entities.switches.after_deodorization_switch ? html`
-        <button
-          class="control-button ${isEntityOn(hass, entities.switches.after_deodorization_switch) ? 'active' : 'secondary'}"
-          @click=${() => onSwitchToggle(entities.switches.after_deodorization_switch)}
-        >
-          <ha-icon icon="mdi:air-purifier"></ha-icon>
-          Auto Deodorize
-        </button>
-      ` : nothing}
+        ${entities.switches.after_deodorization_switch ? html`
+          <petlibro-pill-button
+            icon="mdi:air-purifier"
+            ?active=${isEntityOn(hass, entities.switches.after_deodorization_switch)}
+            @click=${() => onSwitchToggle(entities.switches.after_deodorization_switch)}
+          >Auto Deodorize</petlibro-pill-button>
+        ` : nothing}
 
-      ${entities.switches.avoid_repeat_clean ? html`
-        <button
-          class="control-button ${isEntityOn(hass, entities.switches.avoid_repeat_clean) ? 'active' : 'secondary'}"
-          @click=${() => onSwitchToggle(entities.switches.avoid_repeat_clean)}
-        >
-          <ha-icon icon="mdi:repeat-off"></ha-icon>
-          No Repeat
-        </button>
-      ` : nothing}
+        ${entities.switches.avoid_repeat_clean ? html`
+          <petlibro-pill-button
+            icon="mdi:repeat-off"
+            ?active=${isEntityOn(hass, entities.switches.avoid_repeat_clean)}
+            @click=${() => onSwitchToggle(entities.switches.avoid_repeat_clean)}
+          >No Repeat</petlibro-pill-button>
+        ` : nothing}
 
-      ${entities.switches.enable_auto_clean_in_sleep_mode ? html`
-        <button
-          class="control-button ${isEntityOn(hass, entities.switches.enable_auto_clean_in_sleep_mode) ? 'active' : 'secondary'}"
-          @click=${() => onSwitchToggle(entities.switches.enable_auto_clean_in_sleep_mode)}
-        >
-          <ha-icon icon="mdi:broom"></ha-icon>
-          Sleep Clean
-        </button>
-      ` : nothing}
+        ${entities.switches.enable_auto_clean_in_sleep_mode ? html`
+          <petlibro-pill-button
+            icon="mdi:broom"
+            ?active=${isEntityOn(hass, entities.switches.enable_auto_clean_in_sleep_mode)}
+            @click=${() => onSwitchToggle(entities.switches.enable_auto_clean_in_sleep_mode)}
+          >Sleep Clean</petlibro-pill-button>
+        ` : nothing}
 
-      ${entities.switches.enable_deodorization_in_sleep_mode ? html`
-        <button
-          class="control-button ${isEntityOn(hass, entities.switches.enable_deodorization_in_sleep_mode) ? 'active' : 'secondary'}"
-          @click=${() => onSwitchToggle(entities.switches.enable_deodorization_in_sleep_mode)}
-        >
-          <ha-icon icon="mdi:weather-windy"></ha-icon>
-          Sleep Deodorize
-        </button>
-      ` : nothing}
+        ${entities.switches.enable_deodorization_in_sleep_mode ? html`
+          <petlibro-pill-button
+            icon="mdi:weather-windy"
+            ?active=${isEntityOn(hass, entities.switches.enable_deodorization_in_sleep_mode)}
+            @click=${() => onSwitchToggle(entities.switches.enable_deodorization_in_sleep_mode)}
+          >Sleep Deodorize</petlibro-pill-button>
+        ` : nothing}
 
-      ${entities.buttons.reset_filter ? html`
-        <button class="control-button secondary" @click=${() => onButtonPress(entities.buttons.reset_filter)}>
-          <ha-icon icon="mdi:air-filter"></ha-icon>
-          Reset Filter
-        </button>
-      ` : nothing}
+        ${entities.buttons.reset_filter ? html`
+          <petlibro-pill-button
+            icon="mdi:air-filter"
+            @click=${() => onButtonPress(entities.buttons.reset_filter)}
+          >Reset Filter</petlibro-pill-button>
+        ` : nothing}
 
-      ${entities.buttons.reset_cleaning ? html`
-        <button class="control-button secondary" @click=${() => onButtonPress(entities.buttons.reset_cleaning)}>
-          <ha-icon icon="mdi:broom"></ha-icon>
-          Reset Clean
-        </button>
-      ` : nothing}
+        ${entities.buttons.reset_cleaning ? html`
+          <petlibro-pill-button
+            icon="mdi:broom"
+            @click=${() => onButtonPress(entities.buttons.reset_cleaning)}
+          >Reset Clean</petlibro-pill-button>
+        ` : nothing}
 
-      ${entities.buttons.reset_mat ? html`
-        <button class="control-button secondary" @click=${() => onButtonPress(entities.buttons.reset_mat)}>
-          <ha-icon icon="mdi:rug"></ha-icon>
-          Reset Mat
-        </button>
-      ` : nothing}
-    </div>
-
-    ${entities.selects.clean_mode || entities.selects.deodorization_wind_speed ||
-      entities.numbers.volume || entities.numbers.auto_delay_sec || entities.numbers.duration_after_deodorization ? html`
-      <div class="settings-section">
-        <div class="settings-section-title">Settings</div>
-        <div class="settings-grid">
-          ${renderSelectRow(hass, entities.selects.clean_mode, 'Clean Mode', onSelectChange)}
-          ${renderSelectRow(hass, entities.selects.deodorization_wind_speed, 'Wind Speed', onSelectChange)}
-          ${renderNumberStepper(hass, entities.numbers.volume, 'Volume', '%', onNumberChange, 10)}
-          ${renderNumberStepper(hass, entities.numbers.auto_delay_sec, 'Clean Delay', 's', onNumberChange, 10)}
-          ${renderNumberStepper(hass, entities.numbers.duration_after_deodorization, 'Deodorize Time', 'm', onNumberChange)}
-        </div>
+        ${entities.buttons.reset_mat ? html`
+          <petlibro-pill-button
+            icon="mdi:rug"
+            @click=${() => onButtonPress(entities.buttons.reset_mat)}
+          >Reset Mat</petlibro-pill-button>
+        ` : nothing}
       </div>
     ` : nothing}
+
+    ${showControls && hasSettings ? html`
+      <div class="settings">
+        ${renderSelectRow(hass, entities.selects.clean_mode, 'mdi:broom', 'purple', 'Clean Mode', onSelectChange)}
+        ${renderSelectRow(hass, entities.selects.deodorization_wind_speed, 'mdi:weather-windy', 'blue', 'Wind Speed', onSelectChange)}
+        ${renderNumberStepper(hass, entities.numbers.volume, 'mdi:volume-high', 'purple', 'Volume', '%', onNumberChange, 10)}
+        ${renderNumberStepper(hass, entities.numbers.auto_delay_sec, 'mdi:timer-outline', 'amber', 'Clean Delay', 's', onNumberChange, 10)}
+        ${renderNumberStepper(hass, entities.numbers.duration_after_deodorization, 'mdi:air-purifier', 'green', 'Deodorize Time', 'm', onNumberChange)}
+      </div>
     ` : nothing}
   `;
 }

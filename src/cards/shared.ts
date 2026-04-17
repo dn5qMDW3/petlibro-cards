@@ -1,55 +1,48 @@
 import { html, nothing, type TemplateResult } from 'lit';
-import { styleMap } from 'lit/directives/style-map.js';
+import type { PetColor } from '../components/shape-icon';
 import type { DeviceEntities, HomeAssistant } from '../types';
 
-/** Render a single metric tile (icon + label + value). */
-export function renderMetricItem(
+/**
+ * Render an entity-row wrapping a native <select>. Kept as a helper because
+ * at least three call sites need it (feeder feeding_plan_select, litter-box
+ * clean_mode + deodorization_wind_speed).
+ */
+export function renderSelectRow(
+  hass: HomeAssistant,
+  entityId: string | undefined,
   icon: string,
+  color: PetColor,
   label: string,
-  value: string | number,
-  alertClass = '',
-): TemplateResult {
+  onSelectChange: (entityId: string, option: string) => void,
+): TemplateResult | typeof nothing {
+  if (!entityId || !hass.states[entityId]) return nothing;
+  const options: string[] = (hass.states[entityId].attributes?.['options'] as string[] | undefined) ?? [];
+  const current = hass.states[entityId].state;
+
   return html`
-    <div class="metric-item ${alertClass}">
-      <ha-icon class="metric-icon" icon="${icon}"></ha-icon>
-      <div class="metric-content">
-        <div class="metric-label">${label}</div>
-        <div class="metric-value">${value}</div>
-      </div>
-    </div>
+    <petlibro-entity-row .icon=${icon} .color=${color} .primary=${label}>
+      <select
+        slot="trailing"
+        class="pet-select"
+        @change=${(e: Event) => onSelectChange(entityId, (e.target as HTMLSelectElement).value)}
+      >
+        ${options.map((opt) => html`
+          <option value=${opt} ?selected=${current === opt}>${opt}</option>
+        `)}
+      </select>
+    </petlibro-entity-row>
   `;
 }
 
-/** Render a metric tile with an inline gauge fill bar (uses styleMap, not inline string). */
-export function renderGaugeMetric(
-  icon: string,
-  label: string,
-  value: string | number,
-  percent: number,
-  gaugeClass = '',
-  alertClass = '',
-): TemplateResult {
-  return html`
-    <div class="metric-item ${alertClass}">
-      <ha-icon class="metric-icon" icon="${icon}"></ha-icon>
-      <div class="metric-content">
-        <div class="metric-label">${label}</div>
-        <div class="metric-value">${value}</div>
-        <div class="gauge-track">
-          <div
-            class="gauge-fill ${gaugeClass}"
-            style=${styleMap({ width: `${Math.min(100, Math.max(0, percent))}%` })}
-          ></div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-/** Render a stepper input (− value +) for a number entity. */
+/**
+ * Render an entity-row wrapping a <petlibro-stepper> for a number entity.
+ * Called three times from litter-box (volume, auto_delay_sec, duration_after_deodorization).
+ */
 export function renderNumberStepper(
   hass: HomeAssistant,
   entityId: string | undefined,
+  icon: string,
+  color: PetColor,
   label: string,
   unit: string,
   onNumberChange: (entityId: string, value: number) => void,
@@ -63,51 +56,25 @@ export function renderNumberStepper(
   const step = Number(attrs['step'] ?? defaultStep);
 
   return html`
-    <div class="setting-row">
-      <span class="setting-label">${label}</span>
-      <div class="number-control">
-        <button
-          class="number-btn"
-          @click=${() => onNumberChange(entityId, Math.max(min, current - step))}
-        >−</button>
-        <span class="value">${current}${unit}</span>
-        <button
-          class="number-btn"
-          @click=${() => onNumberChange(entityId, Math.min(max, current + step))}
-        >+</button>
-      </div>
-    </div>
+    <petlibro-entity-row .icon=${icon} .color=${color} .primary=${label}>
+      <petlibro-stepper
+        slot="trailing"
+        .value=${current}
+        .min=${min}
+        .max=${max}
+        .step=${step}
+        .unit=${unit}
+        @petlibro-stepper-change=${(e: CustomEvent<{ value: number }>) =>
+          onNumberChange(entityId, e.detail.value)}
+      ></petlibro-stepper>
+    </petlibro-entity-row>
   `;
 }
 
-/** Render a select dropdown for a select entity. */
-export function renderSelectRow(
-  hass: HomeAssistant,
-  entityId: string | undefined,
-  label: string,
-  onSelectChange: (entityId: string, option: string) => void,
-): TemplateResult | typeof nothing {
-  if (!entityId || !hass.states[entityId]) return nothing;
-  const options: string[] = (hass.states[entityId].attributes?.['options'] as string[] | undefined) ?? [];
-  const current = hass.states[entityId].state;
-
-  return html`
-    <div class="setting-row">
-      <span class="setting-label">${label}</span>
-      <div class="setting-control">
-        <select
-          @change=${(e: Event) => onSelectChange(entityId, (e.target as HTMLSelectElement).value)}
-        >
-          ${options.map((opt) => html`
-            <option value=${opt} ?selected=${current === opt}>${opt}</option>
-          `)}
-        </select>
-      </div>
-    </div>
-  `;
-}
-
-/** Render the light toggle button (handles missing light_on or light_off correctly). */
+/**
+ * Render the Light pill button, resolving the correct target button id
+ * (light_on vs light_off) from the entity map. Used by feeder + fountain.
+ */
 export function renderLightToggleButton(
   entities: DeviceEntities,
   lightOn: boolean,
@@ -117,12 +84,10 @@ export function renderLightToggleButton(
   if (!targetId) return nothing;
 
   return html`
-    <button
-      class="control-button ${lightOn ? 'active' : 'secondary'}"
+    <petlibro-pill-button
+      icon="mdi:lightbulb${lightOn ? '' : '-outline'}"
+      ?active=${lightOn}
       @click=${() => onButtonPress(targetId)}
-    >
-      <ha-icon icon="mdi:lightbulb${lightOn ? '' : '-outline'}"></ha-icon>
-      Light
-    </button>
+    >Light</petlibro-pill-button>
   `;
 }

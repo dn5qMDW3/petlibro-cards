@@ -1,5 +1,12 @@
 import { css } from 'lit';
 
+/**
+ * Layout-only styles for <petlibro-cards>. Visual rules (tiles, chips, rows,
+ * buttons, steppers) live inside the individual primitive components under
+ * src/components/. Native-element customizations (e.g., slotted <select>)
+ * stay here because they render inside the top-level light template before
+ * being slotted into a primitive's shadow tree.
+ */
 export const cardStyles = css`
   :host {
     display: block;
@@ -8,213 +15,68 @@ export const cardStyles = css`
   ha-card {
     padding: 16px;
     overflow: hidden;
+    border-radius: var(--pet-radius-card, 16px);
   }
 
-  /* Header: image + name + status */
-  .card-header {
+  /* Status chip row at the top */
+  .chip-row {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    gap: var(--pet-gap-chip, 6px);
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  /* Device header spacing (petlibro-card-header is followed by the tile grid) */
+  petlibro-card-header {
     margin-bottom: 16px;
   }
 
-  .device-image {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    object-fit: contain;
-    background: var(--secondary-background-color, #f5f5f5);
-    flex-shrink: 0;
-  }
-
-  .device-image-placeholder {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    background: var(--secondary-background-color, #f5f5f5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    color: var(--secondary-text-color);
-  }
-
-  .header-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .device-name {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--primary-text-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .device-model {
-    font-size: 12px;
-    color: var(--secondary-text-color);
-  }
-
-  /* Status badge */
-  .status-badge {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    flex-shrink: 0;
-  }
-
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-  }
-
-  .status-dot.online {
-    background-color: var(--success-color, #4caf50);
-  }
-
-  .status-dot.offline {
-    background-color: var(--error-color, #f44336);
-  }
-
-  .status-text {
-    color: var(--secondary-text-color);
-  }
-
-  /* Metrics grid */
-  .metrics-grid {
+  /* Metric tile grid */
+  .tile-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 8px;
+    gap: var(--pet-gap-tile, 8px);
     margin-bottom: 16px;
   }
 
-  .metric-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px;
-    border-radius: 8px;
-    background: var(--secondary-background-color, #f5f5f5);
-  }
-
-  .metric-item.alert {
-    background: color-mix(in srgb, var(--error-color, #f44336) 10%, transparent);
-  }
-
-  .metric-icon {
-    --mdc-icon-size: 20px;
-    color: var(--state-icon-color, #757575);
-    flex-shrink: 0;
-  }
-
-  .metric-item.alert .metric-icon {
-    color: var(--error-color, #f44336);
-  }
-
-  .metric-content {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .metric-label {
-    font-size: 11px;
-    color: var(--secondary-text-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .metric-value {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--primary-text-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* Gauge bar */
-  .gauge-bar {
-    width: 100%;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--divider-color, #e0e0e0);
-    margin-top: 4px;
-    overflow: hidden;
-  }
-
-  .gauge-fill {
-    height: 100%;
-    border-radius: 2px;
-    background: var(--primary-color, #03a9f4);
-    transition: width 0.3s ease;
-  }
-
-  .gauge-fill.warning {
-    background: var(--warning-color, #ff9800);
-  }
-
-  .gauge-fill.error {
-    background: var(--error-color, #f44336);
-  }
-
-  /* Controls row */
-  .controls-row {
+  /* Pill-button row (controls) */
+  .chip-controls {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--pet-gap-chip, 6px);
     justify-content: center;
   }
 
-  .control-button {
+  /* Stack of entity rows (settings) */
+  .settings {
     display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: none;
-    background: var(--primary-color, #03a9f4);
-    color: var(--text-primary-color, #fff);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    font-family: inherit;
+    flex-direction: column;
+    gap: var(--pet-gap-row, 6px);
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--divider-color, #e0e0e0);
   }
 
-  .control-button:hover {
-    opacity: 0.85;
-  }
-
-  .control-button:active {
-    opacity: 0.7;
-  }
-
-  .control-button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  .control-button.secondary {
-    background: var(--secondary-background-color, #f5f5f5);
+  /* Native <select> slotted into petlibro-entity-row's trailing slot.
+     Lives in light-template CSS because the <select> is rendered in
+     <petlibro-cards>'s shadow tree before being slotted. */
+  select.pet-select {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--divider-color, #e0e0e0);
+    background: var(--card-background-color, #fff);
     color: var(--primary-text-color);
+    font-size: var(--pet-font-secondary, 13px);
+    font-family: inherit;
+    cursor: pointer;
   }
 
-  .control-button.active {
-    background: var(--primary-color, #03a9f4);
-    color: var(--text-primary-color, #fff);
+  select.pet-select:focus {
+    outline: none;
+    border-color: var(--primary-color, #03a9f4);
   }
 
-  .control-button ha-icon {
-    --mdc-icon-size: 18px;
-  }
-
-  /* Unavailable state */
+  /* Error/unavailable state used by top-level fallback */
   .unavailable {
     text-align: center;
     padding: 24px;
@@ -225,123 +87,5 @@ export const cardStyles = css`
     --mdc-icon-size: 48px;
     margin-bottom: 8px;
     display: block;
-  }
-
-  /* Battery indicator */
-  .battery-indicator {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .battery-indicator.low {
-    color: var(--error-color, #f44336);
-  }
-
-  .battery-indicator.medium {
-    color: var(--warning-color, #ff9800);
-  }
-
-  .battery-indicator.good {
-    color: var(--success-color, #4caf50);
-  }
-
-  /* Settings section */
-  .settings-section {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--divider-color, #e0e0e0);
-  }
-
-  .settings-section-title {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--secondary-text-color);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 8px;
-  }
-
-  .settings-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .setting-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 6px 8px;
-    border-radius: 8px;
-    background: var(--secondary-background-color, #f5f5f5);
-  }
-
-  .setting-label {
-    font-size: 13px;
-    color: var(--primary-text-color);
-    flex-shrink: 0;
-  }
-
-  .setting-control {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .setting-control select {
-    padding: 4px 8px;
-    border-radius: 6px;
-    border: 1px solid var(--divider-color, #e0e0e0);
-    background: var(--card-background-color, #fff);
-    color: var(--primary-text-color);
-    font-size: 13px;
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .setting-control select:focus {
-    outline: none;
-    border-color: var(--primary-color, #03a9f4);
-  }
-
-  .number-control {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .number-control .value {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--primary-text-color);
-    min-width: 40px;
-    text-align: center;
-  }
-
-  .number-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: none;
-    background: var(--primary-color, #03a9f4);
-    color: var(--text-primary-color, #fff);
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    line-height: 1;
-  }
-
-  .number-btn:hover {
-    opacity: 0.85;
-  }
-
-  .number-btn:active {
-    opacity: 0.7;
   }
 `;
