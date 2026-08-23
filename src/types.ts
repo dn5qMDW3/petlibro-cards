@@ -30,6 +30,17 @@ export interface HomeAssistant {
     service: string,
     data?: Record<string, unknown>,
   ) => Promise<void>;
+  /**
+   * HA's own state formatter — the one the built-in tile and entity rows use.
+   * Applies the user's locale, unit preference and per-entity display
+   * precision. Optional because very old cores lack it.
+   */
+  formatEntityState?: (stateObj: HassState, state?: string) => string;
+  formatEntityAttributeValue?: (
+    stateObj: HassState,
+    attribute: string,
+    value?: unknown,
+  ) => string;
 }
 
 export interface HassState {
@@ -50,6 +61,8 @@ export interface HassEntityRegistryEntry {
    * the entity_id, which HA derives from the entity's *name*.
    */
   translation_key?: string;
+  /** Entity-level name, already localised and without the device prefix. */
+  name?: string;
 }
 
 export interface HassDeviceRegistryEntry {
@@ -59,4 +72,20 @@ export interface HassDeviceRegistryEntry {
   configuration_url?: string;
   manufacturer?: string | null;
   model?: string | null;
+}
+
+/** Service calls a card can make. Bundled so adding one does not change every signature. */
+export interface CardActions {
+  press: (entityId: string) => void;
+  toggle: (entityId: string) => void;
+  select: (entityId: string, option: string) => void;
+  setNumber: (entityId: string, value: number) => void;
+}
+
+/** Everything a card renderer needs. */
+export interface CardContext {
+  hass: HomeAssistant;
+  entities: DeviceEntities;
+  showControls: boolean;
+  actions: CardActions;
 }

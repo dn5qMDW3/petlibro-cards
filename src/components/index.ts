@@ -12,6 +12,7 @@ import './tile';
 import './entity-row';
 import './pill-button';
 import './stepper';
+import './section';
 
 export type { PetColor, PetShapeSize } from './shape-icon';
 export type { PetChipVariant } from './chip';

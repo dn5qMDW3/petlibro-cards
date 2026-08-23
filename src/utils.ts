@@ -249,3 +249,43 @@ export function getBatteryIcon(level: number): string {
   if (level >= 10) return 'mdi:battery-10';
   return 'mdi:battery-alert';
 }
+
+/**
+ * Human label for an entity, without the device name in front of it.
+ *
+ * The registry's entity-level name is already localised by Home Assistant and
+ * respects a user rename, so it beats hardcoding a label table in the card.
+ * Falls back to the friendly_name with the device name trimmed off.
+ */
+export function entityLabel(hass: HomeAssistant, entityId: string, deviceName?: string): string {
+  const registryName = hass.entities?.[entityId]?.name;
+  if (registryName) return registryName;
+
+  const friendly = hass.states[entityId]?.attributes?.['friendly_name'];
+  let label = typeof friendly === 'string' ? friendly : entityId;
+  if (deviceName && label.startsWith(deviceName)) {
+    label = label.slice(deviceName.length).trim();
+  }
+  return label || entityId;
+}
+
+/**
+ * Format an entity's state the way Home Assistant would.
+ *
+ * Delegates to `hass.formatEntityState`, which respects the user's locale,
+ * unit preference and the entity's display precision — all of which manual
+ * `${state} ${unit}` interpolation silently ignores. Falls back to that manual
+ * form on cores too old to expose the helper.
+ */
+export function formatState(hass: HomeAssistant, entityId: string | undefined): string | undefined {
+  if (!entityId) return undefined;
+  const stateObj = hass.states[entityId];
+  if (!stateObj) return undefined;
+  if (stateObj.state === 'unknown' || stateObj.state === 'unavailable') return undefined;
+
+  if (typeof hass.formatEntityState === 'function') {
+    return hass.formatEntityState(stateObj);
+  }
+  const unit = stateObj.attributes?.['unit_of_measurement'];
+  return unit ? `${stateObj.state} ${unit}` : stateObj.state;
+}

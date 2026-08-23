@@ -1,20 +1,18 @@
 import { html, nothing, type TemplateResult } from 'lit';
-import type { DeviceEntities, HomeAssistant } from '../types';
-import { getBatteryIcon, getNumericState, getStateValue, isEntityOn } from '../utils';
-import { renderLightToggleButton } from './shared';
+import type { CardContext } from '../types';
+import { formatState, getBatteryIcon, getNumericState, getStateValue, isEntityOn } from '../utils';
+import { renderAlertsSection, renderLightToggleButton } from './shared';
 
-export function renderFountainCard(
-  hass: HomeAssistant,
-  entities: DeviceEntities,
-  onButtonPress: (entityId: string) => void,
-  showControls: boolean = true,
-): TemplateResult {
+export function renderFountainCard(ctx: CardContext): TemplateResult {
+  const { hass, entities, showControls } = ctx;
+  const onButtonPress = ctx.actions.press;
   const battery = getNumericState(hass, entities.sensors.electric_quantity);
   const waterPercent = getNumericState(hass, entities.sensors.weight_percent);
-  const remainingWater = getStateValue(hass, entities.sensors.remaining_water);
-  const remainingWaterUnit = hass.states[entities.sensors.remaining_water ?? '']?.attributes?.unit_of_measurement ?? 'mL';
-  const todayDrinking = getStateValue(hass, entities.sensors.today_drinking_amount);
-  const todayDrinkingUnit = hass.states[entities.sensors.today_drinking_amount ?? '']?.attributes?.unit_of_measurement ?? 'mL';
+  const remainingWater = formatState(hass, entities.sensors.remaining_water);
+  const todayDrinking = formatState(hass, entities.sensors.today_drinking_amount);
+  const yesterdayDrinking = formatState(hass, entities.sensors.yesterday_drinking_amount);
+  const drinkCount = getStateValue(hass, entities.sensors.today_drinking_count);
+  const drinkTime = formatState(hass, entities.sensors.today_drinking_time);
   const filterDays = getStateValue(hass, entities.sensors.remaining_filter_days);
   const cleaningDays = getStateValue(hass, entities.sensors.remaining_cleaning_days);
   const lightOn = isEntityOn(hass, entities.binary_sensors.light_switch);
@@ -63,7 +61,7 @@ export function renderFountainCard(
           icon="mdi:water"
           color="blue"
           label="Remaining Water"
-          value="${Math.round(Number(remainingWater))} ${remainingWaterUnit}"
+          value=${remainingWater}
         ></petlibro-tile>
       ` : nothing}
 
@@ -72,7 +70,34 @@ export function renderFountainCard(
           icon="mdi:cup-water"
           color="blue"
           label="Today's Drinking"
-          value="${todayDrinking} ${todayDrinkingUnit}"
+          value=${todayDrinking}
+        ></petlibro-tile>
+      ` : nothing}
+
+      ${yesterdayDrinking !== undefined ? html`
+        <petlibro-tile
+          icon="mdi:cup-outline"
+          color="default"
+          label="Yesterday"
+          value=${yesterdayDrinking}
+        ></petlibro-tile>
+      ` : nothing}
+
+      ${drinkCount !== undefined ? html`
+        <petlibro-tile
+          icon="mdi:counter"
+          color="blue"
+          label="Drinks Today"
+          value="${drinkCount}"
+        ></petlibro-tile>
+      ` : nothing}
+
+      ${drinkTime !== undefined ? html`
+        <petlibro-tile
+          icon="mdi:timer-sand"
+          color="blue"
+          label="Drinking Time"
+          value=${drinkTime}
         ></petlibro-tile>
       ` : nothing}
 
@@ -114,5 +139,7 @@ export function renderFountainCard(
         ` : nothing}
       </div>
     ` : nothing}
+
+    ${showControls ? renderAlertsSection(ctx) : nothing}
   `;
 }

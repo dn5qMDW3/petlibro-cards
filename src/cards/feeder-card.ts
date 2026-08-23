@@ -1,16 +1,11 @@
 import { html, nothing, type TemplateResult } from 'lit';
-import type { DeviceEntities, HomeAssistant } from '../types';
+import type { CardContext } from '../types';
 import { formatTime, getBatteryIcon, getNumericState, getStateValue, isEntityOn } from '../utils';
-import { renderLightToggleButton, renderSelectRow } from './shared';
+import { renderAlertsSection, renderLightToggleButton, renderSelectRow } from './shared';
 
-export function renderFeederCard(
-  hass: HomeAssistant,
-  entities: DeviceEntities,
-  onButtonPress: (entityId: string) => void,
-  onSwitchToggle: (entityId: string) => void,
-  onSelectChange: (entityId: string, option: string) => void,
-  showControls: boolean = true,
-): TemplateResult {
+export function renderFeederCard(ctx: CardContext): TemplateResult {
+  const { hass, entities, showControls } = ctx;
+  const { press: onButtonPress, toggle: onSwitchToggle, select: onSelectChange } = ctx.actions;
   const battery = getNumericState(hass, entities.sensors.electric_quantity);
   const foodLow = isEntityOn(hass, entities.binary_sensors.food_low);
   const todayQty = getStateValue(hass, entities.sensors.today_feeding_quantity_weight);
@@ -191,5 +186,7 @@ export function renderFeederCard(
         ` : nothing}
       </div>
     ` : nothing}
+
+    ${showControls ? renderAlertsSection(ctx) : nothing}
   `;
 }

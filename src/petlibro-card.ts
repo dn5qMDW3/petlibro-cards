@@ -2,7 +2,13 @@ import { LitElement, html, nothing, type PropertyValues, type TemplateResult } f
 import { customElement, property, state } from 'lit/decorators.js';
 import { CARD_NAME, CARD_VERSION, EDITOR_NAME } from './const';
 import { cardStyles } from './styles';
-import type { DeviceEntities, DeviceType, HomeAssistant, PetlibroCardConfig } from './types';
+import type {
+  CardContext,
+  DeviceEntities,
+  DeviceType,
+  HomeAssistant,
+  PetlibroCardConfig,
+} from './types';
 import {
   detectDeviceType,
   getDeviceEntities,
@@ -71,6 +77,20 @@ export class PetlibroCard extends LitElement {
 
   public getCardSize(): number {
     return 4;
+  }
+
+  /**
+   * Sizing for the sections view, which is Home Assistant's modern dashboard
+   * layout. Without this a card is given a default footprint and usually ends
+   * up cramped. Columns are in thirds of the 12-column grid; rows are ~56px.
+   */
+  public getGridOptions(): Record<string, number> {
+    return {
+      columns: 12,
+      rows: 6,
+      min_columns: 6,
+      min_rows: 3,
+    };
   }
 
   protected shouldUpdate(changedProps: PropertyValues): boolean {
@@ -171,33 +191,25 @@ export class PetlibroCard extends LitElement {
 
     const showControls = this._config.show_controls ?? true;
 
+    const ctx: CardContext = {
+      hass: this.hass,
+      entities: this._entities,
+      showControls,
+      actions: {
+        press: (id) => this._handleButtonPress(id),
+        toggle: (id) => this._handleSwitchToggle(id),
+        select: (id, option) => this._handleSelectChange(id, option),
+        setNumber: (id, value) => this._handleNumberChange(id, value),
+      },
+    };
+
     switch (this._deviceType) {
       case 'feeder':
-        return renderFeederCard(
-          this.hass,
-          this._entities,
-          (entityId) => this._handleButtonPress(entityId),
-          (entityId) => this._handleSwitchToggle(entityId),
-          (entityId, option) => this._handleSelectChange(entityId, option),
-          showControls,
-        );
+        return renderFeederCard(ctx);
       case 'fountain':
-        return renderFountainCard(
-          this.hass,
-          this._entities,
-          (entityId) => this._handleButtonPress(entityId),
-          showControls,
-        );
+        return renderFountainCard(ctx);
       case 'litter_box':
-        return renderLitterBoxCard(
-          this.hass,
-          this._entities,
-          (entityId) => this._handleButtonPress(entityId),
-          (entityId) => this._handleSwitchToggle(entityId),
-          (entityId, option) => this._handleSelectChange(entityId, option),
-          (entityId, value) => this._handleNumberChange(entityId, value),
-          showControls,
-        );
+        return renderLitterBoxCard(ctx);
       default:
         return html`<div class="unavailable">Unknown device type</div>`;
     }

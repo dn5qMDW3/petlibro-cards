@@ -1,6 +1,7 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import type { PetColor } from '../components/shape-icon';
-import type { DeviceEntities, HomeAssistant } from '../types';
+import type { CardContext, DeviceEntities, HomeAssistant } from '../types';
+import { entityLabel, isEntityOn } from '../utils';
 
 /**
  * Render an entity-row wrapping a native <select>. Kept as a helper because
@@ -89,5 +90,59 @@ export function renderLightToggleButton(
       ?active=${lightOn}
       @click=${() => onButtonPress(targetId)}
     >Light</petlibro-pill-button>
+  `;
+}
+
+
+/**
+ * Render every notification toggle the device exposes, inside a collapsed
+ * section.
+ *
+ * Deliberately generic: it picks up any switch whose key starts with `notice_`
+ * and takes its label from the entity registry. A device can have a dozen of
+ * these and the integration keeps adding more, so enumerating them here would
+ * only go stale — and the registry label is already localised.
+ */
+export function renderAlertsSection(ctx: CardContext): TemplateResult | typeof nothing {
+  const { hass, entities } = ctx;
+
+  const alerts = Object.entries(entities.switches)
+    .filter(([key]) => key.startsWith('notice_'))
+    .map(([key, entityId]) => ({ key, entityId }))
+    .filter(({ entityId }) => hass.states[entityId] !== undefined)
+    .map(({ key, entityId }) => ({
+      key,
+      entityId,
+      label: entityLabel(hass, entityId),
+      on: isEntityOn(hass, entityId),
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
+  if (alerts.length === 0) return nothing;
+
+  const enabled = alerts.filter((a) => a.on).length;
+
+  return html`
+    <petlibro-section
+      label="Alerts"
+      icon="mdi:bell-outline"
+      summary="${enabled} of ${alerts.length} on"
+    >
+      ${alerts.map(
+        (a) => html`
+          <petlibro-entity-row
+            .icon=${a.on ? 'mdi:bell' : 'mdi:bell-off-outline'}
+            .color=${a.on ? 'amber' : 'default'}
+            .primary=${a.label}
+          >
+            <ha-switch
+              slot="trailing"
+              ?checked=${a.on}
+              @change=${() => ctx.actions.toggle(a.entityId)}
+            ></ha-switch>
+          </petlibro-entity-row>
+        `,
+      )}
+    </petlibro-section>
   `;
 }

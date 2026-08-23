@@ -1,17 +1,31 @@
 import { html, nothing, type TemplateResult } from 'lit';
-import type { DeviceEntities, HomeAssistant } from '../types';
+import type { CardContext } from '../types';
 import { getBatteryIcon, getNumericState, getStateValue, isEntityOn } from '../utils';
-import { renderNumberStepper, renderSelectRow } from './shared';
+import { renderAlertsSection, renderNumberStepper, renderSelectRow } from './shared';
 
-export function renderLitterBoxCard(
-  hass: HomeAssistant,
-  entities: DeviceEntities,
-  onButtonPress: (entityId: string) => void,
-  onSwitchToggle: (entityId: string) => void,
-  onSelectChange: (entityId: string, option: string) => void,
-  onNumberChange: (entityId: string, value: number) => void,
-  showControls: boolean = true,
-): TemplateResult {
+export function renderLitterBoxCard(ctx: CardContext): TemplateResult {
+  const { hass, entities, showControls } = ctx;
+  const {
+    press: onButtonPress,
+    toggle: onSwitchToggle,
+    select: onSelectChange,
+    setNumber: onNumberChange,
+  } = ctx.actions;
+
+  const cleanPlanCount = getStateValue(hass, entities.sensors.clean_plan_count);
+  // The sensor carries the schedules themselves in `plans`, so the tile can
+  // show the next run rather than a bare count.
+  const nextCleanLabel = (() => {
+    const plans = hass.states[entities.sensors.clean_plan_count ?? '']?.attributes?.['plans'];
+    if (!Array.isArray(plans) || plans.length === 0) return undefined;
+    const enabled = plans.filter((p) => (p as Record<string, unknown>)?.['enable']);
+    if (enabled.length === 0) return undefined;
+    const times = enabled
+      .map((p) => String((p as Record<string, unknown>)?.['executionTime'] ?? ''))
+      .filter(Boolean)
+      .sort();
+    return times[0] ? `${times[0]}${enabled.length > 1 ? ` +${enabled.length - 1}` : ''}` : undefined;
+  })();
   const battery = getNumericState(hass, entities.sensors.electric_quantity);
   const litterPercent = getNumericState(hass, entities.sensors.weight_percent);
   const wasteFull = isEntityOn(hass, entities.binary_sensors.rubbish_full_state);
@@ -31,9 +45,9 @@ export function renderLitterBoxCard(
   const hasAlertChips = wasteFull;
 
   const hasSettings = !!(
-    entities.selects.clean_mode ||
-    entities.selects.deodorization_wind_speed ||
-    entities.numbers.volume ||
+    entities.selects.clean_mode_select ||
+    entities.selects.deodorization_wind_speed_select ||
+    entities.numbers.volume_control ||
     entities.numbers.auto_delay_sec ||
     entities.numbers.duration_after_deodorization
   );
@@ -108,6 +122,16 @@ export function renderLitterBoxCard(
           value=${String(deodorMode)}
         ></petlibro-tile>
       ` : nothing}
+    
+      ${cleanPlanCount !== undefined ? html`
+        <petlibro-tile
+          icon="mdi:calendar-clock"
+          .color=${Number(cleanPlanCount) > 0 ? 'green' : 'default'}
+          label="Schedules"
+          value="${nextCleanLabel ?? (Number(cleanPlanCount) === 0 ? 'None' : cleanPlanCount)}"
+        ></petlibro-tile>
+      ` : nothing}
+
     </div>
 
     ${showControls ? html`
@@ -200,12 +224,14 @@ export function renderLitterBoxCard(
 
     ${showControls && hasSettings ? html`
       <div class="settings">
-        ${renderSelectRow(hass, entities.selects.clean_mode, 'mdi:broom', 'purple', 'Clean Mode', onSelectChange)}
-        ${renderSelectRow(hass, entities.selects.deodorization_wind_speed, 'mdi:weather-windy', 'blue', 'Wind Speed', onSelectChange)}
-        ${renderNumberStepper(hass, entities.numbers.volume, 'mdi:volume-high', 'purple', 'Volume', '%', onNumberChange, 10)}
+        ${renderSelectRow(hass, entities.selects.clean_mode_select, 'mdi:broom', 'purple', 'Clean Mode', onSelectChange)}
+        ${renderSelectRow(hass, entities.selects.deodorization_wind_speed_select, 'mdi:weather-windy', 'blue', 'Wind Speed', onSelectChange)}
+        ${renderNumberStepper(hass, entities.numbers.volume_control, 'mdi:volume-high', 'purple', 'Volume', '%', onNumberChange, 10)}
         ${renderNumberStepper(hass, entities.numbers.auto_delay_sec, 'mdi:timer-outline', 'amber', 'Clean Delay', 's', onNumberChange, 10)}
         ${renderNumberStepper(hass, entities.numbers.duration_after_deodorization, 'mdi:air-purifier', 'green', 'Deodorize Time', 'm', onNumberChange)}
       </div>
     ` : nothing}
+
+    ${showControls ? renderAlertsSection(ctx) : nothing}
   `;
 }
