@@ -17,17 +17,24 @@ Custom [Home Assistant](https://www.home-assistant.io/) Lovelace card for [PetLi
 | **Feeders** | Air Smart, Granary Smart, Granary Camera, One RFID, Polar Wet Food, Space Smart |
 | **Fountains** | Dockstream Smart, Dockstream RFID, Dockstream 2 Cordless, Dockstream 2 |
 | **Litter Boxes** | Luma Smart Litter Box |
+| **Pets** | Any pet profile on your account |
 
 ## Features
 
-- Auto-detects device type from any entity
+- Auto-detects device type from any entity — feeder, fountain, litter box or pet
 - Displays device product image from the API
 - Real-time status: battery, food/water/litter levels, feeding schedule
 - Basic controls: manual feed, light toggle, start clean, and more
 - Visual config editor — no YAML needed
 - HA native styling with theme support
+- Pet cards: weight against goal, breed, age, RFID collar, and editable
+  feeding / drinking / walking / playing / training goals
+- Collapsible **Alerts** section exposing the device's notification toggles
 - Entities are matched by the integration's own keys, so renaming an entity in
   Home Assistant does not break the card
+- Values are formatted by Home Assistant, so they follow your locale, unit
+  preferences and per-entity display precision
+- Sized correctly in both the masonry and sections dashboard layouts
 
 ## Installation
 

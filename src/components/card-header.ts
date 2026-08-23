@@ -12,6 +12,11 @@ export class PetlibroCardHeader extends LitElement {
   @property({ type: String }) model?: string;
   @property({ type: Boolean, reflect: true }) online = false;
   @property({ type: String }) fallbackIcon = 'mdi:paw';
+  /**
+   * Whether to show the online indicator. Pets are profiles, not appliances —
+   * they have no connectivity, so labelling one "Offline" is just wrong.
+   */
+  @property({ type: Boolean }) showStatus = true;
 
   static styles = css`
     :host {
@@ -80,10 +85,12 @@ export class PetlibroCardHeader extends LitElement {
         <div class="name">${this.name}</div>
         ${this.model ? html`<div class="model">${this.model}</div>` : nothing}
       </div>
-      <div class="status">
-        <div class="dot"></div>
-        <span>${this.online ? 'Online' : 'Offline'}</span>
-      </div>
+      ${this.showStatus
+        ? html`<div class="status">
+            <div class="dot"></div>
+            <span>${this.online ? 'Online' : 'Offline'}</span>
+          </div>`
+        : nothing}
     `;
   }
 }

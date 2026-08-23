@@ -1,4 +1,4 @@
-export type DeviceType = 'feeder' | 'fountain' | 'litter_box';
+export type DeviceType = 'feeder' | 'fountain' | 'litter_box' | 'pet';
 
 export interface PetlibroCardConfig {
   type: string;

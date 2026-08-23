@@ -21,6 +21,7 @@ import {
 import { renderFeederCard } from './cards/feeder-card';
 import { renderFountainCard } from './cards/fountain-card';
 import { renderLitterBoxCard } from './cards/litter-box-card';
+import { renderPetCard } from './cards/pet-card';
 import { tokens } from './tokens';
 import './components';
 
@@ -173,7 +174,11 @@ export class PetlibroCard extends LitElement {
     const representativeEntity = this._primaryEntityId ?? '';
     const imageUrl = getDeviceImage(this.hass, representativeEntity, this._deviceId!);
     const online = isEntityOn(this.hass, this._entities!.binary_sensors.online);
-    const model = this.hass.devices?.[this._deviceId!]?.model;
+    const isPet = this._deviceType === 'pet';
+    // "Pet" as a model tells the user nothing; the breed does.
+    const model = isPet
+      ? this.hass.states[this._entities!.sensors.breed_name ?? '']?.state
+      : this.hass.devices?.[this._deviceId!]?.model;
 
     return html`
       <petlibro-card-header
@@ -181,6 +186,7 @@ export class PetlibroCard extends LitElement {
         .name=${name}
         .model=${model ?? undefined}
         ?online=${online}
+        .showStatus=${!isPet}
         .fallbackIcon=${this._getDeviceTypeIcon()}
       ></petlibro-card-header>
     `;
@@ -210,6 +216,8 @@ export class PetlibroCard extends LitElement {
         return renderFountainCard(ctx);
       case 'litter_box':
         return renderLitterBoxCard(ctx);
+      case 'pet':
+        return renderPetCard(ctx);
       default:
         return html`<div class="unavailable">Unknown device type</div>`;
     }
@@ -236,6 +244,7 @@ export class PetlibroCard extends LitElement {
       case 'feeder': return 'mdi:food-drumstick';
       case 'fountain': return 'mdi:water';
       case 'litter_box': return 'mdi:cat';
+      case 'pet': return 'mdi:paw';
       default: return 'mdi:paw';
     }
   }

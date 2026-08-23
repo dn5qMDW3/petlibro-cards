@@ -7,6 +7,18 @@ export const EDITOR_NAME = 'petlibro-card-editor';
 // Known entity key suffixes from the petlibro integration.
 // Used to match entity_ids to their purpose after stripping the device name prefix.
 
+/**
+ * Pets are devices too, but they are profiles rather than appliances — no
+ * online state, no controls, just identity and goals. These keys appear on
+ * nothing else, so pets are matched first.
+ */
+export const PET_SIGNATURE_KEYS = [
+  'pet_sex',
+  'breed_name',
+  'sterilization',
+  'bound_device_nums',
+] as const;
+
 export const FEEDER_SIGNATURE_KEYS = [
   'food_low',
   'food_status',        // name-based alias for food_low

@@ -1,5 +1,6 @@
 import {
   ALL_KNOWN_KEYS,
+  PET_SIGNATURE_KEYS,
   KEY_ALIASES,
   FEEDER_SIGNATURE_KEYS,
   FOUNTAIN_SIGNATURE_KEYS,
@@ -127,7 +128,14 @@ export function detectDeviceType(entities: DeviceEntities): DeviceType {
     ...Object.keys(entities.binary_sensors),
     ...Object.keys(entities.buttons),
     ...Object.keys(entities.switches),
+    ...Object.keys(entities.numbers),
+    ...Object.keys(entities.selects),
   ]);
+
+  // Pet first: a pet shares no signature key with any appliance.
+  if (PET_SIGNATURE_KEYS.some((k) => allKeys.has(k))) {
+    return 'pet';
+  }
 
   // Litter box: most unique keys
   if (LITTER_BOX_SIGNATURE_KEYS.some((k) => allKeys.has(k))) {
