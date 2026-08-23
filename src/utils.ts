@@ -5,7 +5,14 @@ import {
   FOUNTAIN_SIGNATURE_KEYS,
   LITTER_BOX_SIGNATURE_KEYS,
 } from './const';
-import type { DeviceEntities, DeviceType, HomeAssistant } from './types';
+import type {
+  DeviceEntities,
+  DeviceType,
+  HassEntityRegistryEntry,
+  HomeAssistant,
+} from './types';
+
+const PETLIBRO_PLATFORM = 'petlibro';
 
 const DOMAIN_MAP: Record<string, keyof DeviceEntities> = {
   sensor: 'sensors',
@@ -52,7 +59,27 @@ export function getDeviceId(hass: HomeAssistant, entityId: string): string | und
 }
 
 /**
- * Find all entities belonging to a device and group them by domain + key suffix.
+ * Resolve an entity to its canonical integration key.
+ *
+ * Prefers the registry's `translation_key`, which is exactly the key the
+ * integration declares and is unaffected by user renames. Falls back to
+ * parsing the entity_id suffix, which is all that older Home Assistant
+ * versions expose and which still covers entities that declare no
+ * translation_key.
+ */
+function resolveEntityKey(entityId: string, entry: HassEntityRegistryEntry): string | undefined {
+  // `translation_key` is already the integration's canonical key, so it is
+  // used as-is. Running it through KEY_ALIASES would be wrong: that map is
+  // keyed by *name-derived entity_id suffixes*, and a future collision
+  // between an alias key and a real translation_key would silently corrupt
+  // the lookup.
+  const tk = entry.translation_key;
+  if (tk) return tk;
+  return extractKeySuffix(entityId);
+}
+
+/**
+ * Find all entities belonging to a device and group them by canonical key.
  */
 export function getDeviceEntities(hass: HomeAssistant, deviceId: string): DeviceEntities {
   const result: DeviceEntities = {
@@ -71,16 +98,20 @@ export function getDeviceEntities(hass: HomeAssistant, deviceId: string): Device
 
   for (const [entityId, entry] of Object.entries(hass.entities)) {
     if (entry.device_id !== deviceId) continue;
+    // A device can carry entities from other integrations (a router's
+    // device_tracker, say). Only claim our own, so their keys cannot collide
+    // with ours. `platform` is absent on very old cores — allow those through.
+    if (entry.platform && entry.platform !== PETLIBRO_PLATFORM) continue;
 
     const domain = entityId.substring(0, entityId.indexOf('.'));
     const group = DOMAIN_MAP[domain];
     if (!group) continue;
 
-    const key = extractKeySuffix(entityId);
+    const key = resolveEntityKey(entityId, entry);
     if (key) {
       result[group][key] = entityId;
     }
-    // Silently skip unrecognized suffixes — other integrations may share the device.
+    // Silently skip anything we still cannot place.
   }
 
   return result;

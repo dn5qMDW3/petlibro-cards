@@ -6,6 +6,8 @@
 
 Custom [Home Assistant](https://www.home-assistant.io/) Lovelace card for [PetLibro](https://www.petlibro.com/) smart pet devices. Auto-detects your device type and displays the appropriate UI.
 
+> **This card is built for the [dn5qMDW3/petlibro integration](https://github.com/dn5qMDW3/petlibro)** and is developed alongside it. It reads the entities that integration creates, so install that one first — the card has nothing to show without it. It will not work against a PetLibro account on its own, and other forks of the integration may name entities differently.
+
 ![Petlibro Cards — Fountain](images/screenshot-fountain.png)
 
 ## Supported Devices
@@ -24,6 +26,8 @@ Custom [Home Assistant](https://www.home-assistant.io/) Lovelace card for [PetLi
 - Basic controls: manual feed, light toggle, start clean, and more
 - Visual config editor — no YAML needed
 - HA native styling with theme support
+- Entities are matched by the integration's own keys, so renaming an entity in
+  Home Assistant does not break the card
 
 ## Installation
 
@@ -63,7 +67,23 @@ device_id: abc123def456  # Select via UI device picker
 ## Requirements
 
 - Home Assistant 2025.4.0+
-- [PetLibro integration](https://github.com/dn5qMDW3/petlibro) installed and configured
+- The [dn5qMDW3/petlibro integration](https://github.com/dn5qMDW3/petlibro), installed and configured
+
+### Pairing with the integration
+
+The two projects are developed together and are versioned independently — any
+reasonably recent integration release works, but newer ones give the card more
+to display:
+
+| Integration version | What the card gains |
+|---|---|
+| any | Device detection, status and controls |
+| **v2.5.2+** | Real-time MQTT push, so the card reflects device changes within about a second instead of waiting for the next poll |
+| **v2.5.3+** | Litter box cleaning schedules and per-device notification toggles as entities |
+
+If a value shows as unavailable, check the device in **Settings → Devices &
+Services → PETLIBRO** first — the card only ever renders entities the
+integration provides.
 
 ## Development
 

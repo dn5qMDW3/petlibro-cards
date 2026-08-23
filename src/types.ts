@@ -44,6 +44,12 @@ export interface HassEntityRegistryEntry {
   entity_id: string;
   device_id?: string;
   platform: string;
+  /**
+   * The integration's own key for this entity (HA exposes it on the registry
+   * display collection as `tk`). This is stable across user renames, unlike
+   * the entity_id, which HA derives from the entity's *name*.
+   */
+  translation_key?: string;
 }
 
 export interface HassDeviceRegistryEntry {
