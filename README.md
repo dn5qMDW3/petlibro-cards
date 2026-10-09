@@ -8,7 +8,9 @@ Custom [Home Assistant](https://www.home-assistant.io/) Lovelace card for [PetLi
 
 > **This card is built for the [dn5qMDW3/petlibro integration](https://github.com/dn5qMDW3/petlibro)** and is developed alongside it. It reads the entities that integration creates, so install that one first — the card has nothing to show without it. It will not work against a PetLibro account on its own, and other forks of the integration may name entities differently.
 
-![Petlibro Cards — Fountain](images/screenshot-fountain.png)
+| Fountain | Litter box | Pet |
+|---|---|---|
+| ![Fountain card](images/screenshot-fountain.png) | ![Litter box card](images/screenshot-litter-box.png) | ![Pet card](images/screenshot-pet.png) |
 
 ## Supported Devices
 
@@ -87,6 +89,9 @@ to display:
 | any | Device detection, status and controls |
 | **v2.5.2+** | Real-time MQTT push, so the card reflects device changes within about a second instead of waiting for the next poll |
 | **v2.5.3+** | Litter box cleaning schedules and per-device notification toggles as entities |
+| **v2.7.0+** | The litter box's real litter level, and the Dockstream 2 indicator as a switch |
+
+Integration **v2.6.0 and later need card v0.9.1 or newer**: the integration renamed the dry feeders' today's-schedule sensor and, in v2.7.0, replaced the Dockstream 2 indicator buttons with a switch. Older cards lose the feeder's plan row and the fountain's Light button. The litter level tile needs card v0.9.2.
 
 If a value shows as unavailable, check the device in **Settings → Devices &
 Services → PETLIBRO** first — the card only ever renders entities the
