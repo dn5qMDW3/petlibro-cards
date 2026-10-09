@@ -73,22 +73,27 @@ export function renderNumberStepper(
 }
 
 /**
- * Render the Light pill button, resolving the correct target button id
- * (light_on vs light_off) from the entity map. Used by feeder + fountain.
+ * Render the Light pill button. Used by feeder + fountain.
+ *
+ * Devices expose the indicator either as a single switch (`indicator`, e.g.
+ * the Dockstream 2 fountains since integration v2.7.0) or as a pair of
+ * buttons (`light_on` / `light_off`). The switch is preferred when present.
  */
 export function renderLightToggleButton(
   entities: DeviceEntities,
   lightOn: boolean,
   onButtonPress: (entityId: string) => void,
+  onSwitchToggle: (entityId: string) => void,
 ): TemplateResult | typeof nothing {
-  const targetId = lightOn ? entities.buttons.light_off : entities.buttons.light_on;
-  if (!targetId) return nothing;
+  const switchId = entities.switches.indicator;
+  const buttonId = lightOn ? entities.buttons.light_off : entities.buttons.light_on;
+  if (!switchId && !buttonId) return nothing;
 
   return html`
     <petlibro-pill-button
       icon="mdi:lightbulb${lightOn ? '' : '-outline'}"
       ?active=${lightOn}
-      @click=${() => onButtonPress(targetId)}
+      @click=${() => (switchId ? onSwitchToggle(switchId) : onButtonPress(buttonId))}
     >Light</petlibro-pill-button>
   `;
 }

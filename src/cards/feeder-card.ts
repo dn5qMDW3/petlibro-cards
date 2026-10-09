@@ -148,7 +148,7 @@ export function renderFeederCard(ctx: CardContext): TemplateResult {
           >Ring</petlibro-pill-button>
         ` : nothing}
 
-        ${renderLightToggleButton(entities, lightOn, onButtonPress)}
+        ${renderLightToggleButton(entities, lightOn, onButtonPress, onSwitchToggle)}
       </div>
     ` : nothing}
 

@@ -122,7 +122,7 @@ export function renderFountainCard(ctx: CardContext): TemplateResult {
 
     ${showControls ? html`
       <div class="chip-controls">
-        ${renderLightToggleButton(entities, lightOn, onButtonPress)}
+        ${renderLightToggleButton(entities, lightOn, onButtonPress, ctx.actions.toggle)}
 
         ${entities.buttons.filter_reset ? html`
           <petlibro-pill-button
