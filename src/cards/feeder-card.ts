@@ -13,8 +13,12 @@ export function renderFeederCard(ctx: CardContext): TemplateResult {
   const lastFeed = formatTime(hass, entities.sensors.last_feed_time);
   const nextFeed = formatTime(hass, entities.sensors.next_feed_time);
   const nextQty = getStateValue(hass, entities.sensors.next_feed_quantity_weight);
-  const planAvailable = entities.binary_sensors.feeding_plan_state !== undefined;
-  const planActive = isEntityOn(hass, entities.binary_sensors.feeding_plan_state);
+  // Dry feeders expose `today_feeding_schedule`; the Polar feeder (and older
+  // integration releases) expose the same sensor as `feeding_plan_state`.
+  const planEntity =
+    entities.binary_sensors.today_feeding_schedule ?? entities.binary_sensors.feeding_plan_state;
+  const planAvailable = planEntity !== undefined;
+  const planActive = isEntityOn(hass, planEntity);
   const todayUnit = hass.states[entities.sensors.today_feeding_quantity_weight ?? '']?.attributes?.unit_of_measurement ?? 'g';
   const nextUnit = hass.states[entities.sensors.next_feed_quantity_weight ?? '']?.attributes?.unit_of_measurement ?? 'g';
   const lightOn = isEntityOn(hass, entities.binary_sensors.light_switch);

@@ -23,7 +23,8 @@ export const FEEDER_SIGNATURE_KEYS = [
   'food_low',
   'food_status',        // name-based alias for food_low
   'manual_feed',
-  'feeding_plan_state',
+  'today_feeding_schedule',
+  'feeding_plan_state',  // Polar, and dry feeders before the integration's upstream sync
   'today_feeding_quantity_weight',
   'rotate_food_bowl',
 ] as const;
@@ -182,6 +183,7 @@ export const ALL_KNOWN_KEYS = [
   'next_feed_quantity_volume',
   'enable_low_battery_notice',
   'today_feeding_times',
+  'today_feeding_schedule',
   'feeding_plan_state',
   'remaining_desiccant',
   'manual_feed_quantity',

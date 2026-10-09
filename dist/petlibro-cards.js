@@ -36,7 +36,7 @@ const de=e=>(t,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(e,t)}
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
- */function he(e){return _e({...e,state:!0,attribute:!1})}const ue="0.9.0",ge="petlibro-card",be="petlibro-card-editor",fe=["pet_sex","breed_name","sterilization","bound_device_nums"],me=["food_low","food_status","manual_feed","feeding_plan_state","today_feeding_quantity_weight","rotate_food_bowl"],ve=["remaining_filter_days","remaining_water","remaining_water_volume"],ye=["rubbish_full_state","waste_bin_full","garbage_warehouse_state","waste_bin_state"],$e={wi_fi_signal_strength:"wifi_rssi",wi_fi_ssid:"wifi_ssid",wi_fi_s_s_i_d:"wifi_ssid",battery_level:"battery_state",battery_ac:"electric_quantity",buttons_lock:"child_lock_switch",remaining_desiccant_days:"remaining_desiccant",feeding_plan:"feeding_plan_state",display_value:"display_selection",todays_total_eating_time:"today_eating_time",camera_resolution:"resolution",night_vision_mode:"night_vision",video_recording_enabled:"enable_video_record",video_recording_switch:"video_record_switch",video_recording_mode:"video_record_mode",feeding_begins:"next_feeding_time",feeding_ends:"next_feeding_end_time",manually_open_close_lid:"manual_feed_now",remaining_water_volume:"remaining_water",todays_water_consumption:"today_drinking_amount",total_water_used_today:"today_drinking_amount",yesterdays_water_consumption:"yesterday_drinking_amount",todays_total_drinking_time:"today_drinking_time",todays_average_drinking_time:"today_avg_time",today_drinking_times:"today_drinking_count",yesterday_drinking_times:"yesterday_drinking_count",current_weight_percent:"weight_percent",water_time_duration:"use_water_duration",tank_capacity:"tank_total_ml",alert_message:"exception_message",power_source:"power_state",human_detection_sensitivity:"human_sensitivity_level",battery_status:"battery_charge_state",battery8_hour_supply:"battery_supply_8_hours",litter_level:"weight_percent",litter_weight:"weight",cleanliness_state:"clean_state",waste_bin_state:"garbage_warehouse_state",mat_replacement_days:"remaining_mat_days",filter_replacement_days:"remaining_replacement_days",food_dispenser:"food_dispenser_state",food_status:"food_low",today_s_feeding_schedule:"feeding_plan_state",wi_fi:"online",sleep_mode:"whether_in_sleep_mode",lid_status:"door_blocked",lid:"door_state",indicator:"light_switch",sound_status:"sound_switch",food_outlet:"food_outlet_state",device_error:"device_stopped_working",device_fault:"device_stopped_working",door_error:"barn_door_error",deodorization_active:"deodorization_state_on",display_status:"display_switch",waste_bin_full:"rubbish_full_state",waste_bin_installed:"rubbish_inplace_state",water_dispensing_state:"water_state",vacuum_active:"vacuum_state",door:"door_open",run_air_purifier:"trigger_vacuum",open_door:"trigger_open_door",close_door:"trigger_close_door",level_litter:"trigger_level_litter",empty_waste_bin:"trigger_empty_waste",start_clean_cycle:"trigger_clean",stop_current_action:"trigger_stop_action",manually_open_lid:"manual_lid_open",turn_on_sleep_mode:"sleep_on",turn_off_sleep_mode:"sleep_off",turn_on_sound:"sound_on",turn_off_sound:"sound_off",turn_on_indicator:"light_on",turn_off_indicator:"light_off",turn_on_display:"display_on",turn_off_display:"display_off",desiccant_replaced:"desiccant_reset",reposition_the_schedule:"reposition_schedule",enable_selected_plan:"feeding_plan_enable",disable_selected_plan:"feeding_plan_disable",delete_selected_plan:"feeding_plan_delete",skip_selected_plan_today:"feeding_plan_skip_today",un_skip_selected_plan_today:"feeding_plan_unskip_today",enable_today_s_feeding_schedule:"feeding_plan_today_enable_all",disable_today_s_feeding_schedule:"feeding_plan_today_disable_all",enable_feeding_schedule:"enable_feeding_plan",disable_feeding_schedule:"disable_feeding_plan",reset_cleaning_timer:"reset_cleaning",reset_filter_timer:"reset_filter",reset_mat_timer:"reset_mat",light:"light_switch",sound:"sound_switch",deodorization:"deodorization_mode_switch",after_use_deodorization:"after_deodorization_switch",auto_clean_in_sleep_mode:"enable_auto_clean_in_sleep_mode",deodorize_in_sleep_mode:"enable_deodorization_in_sleep_mode",icon_to_display:"display_icon",auto_clean_delay:"auto_delay_sec",post_use_deodorization_duration:"duration_after_deodorization",text_on_display:"display_text"},we=["today_feeding_quantity_weight","today_feeding_quantity_volume","last_feed_quantity_weight","last_feed_quantity_volume","next_feed_quantity_weight","next_feed_quantity_volume","enable_low_battery_notice","today_feeding_times","feeding_plan_state","remaining_desiccant","manual_feed_quantity","electric_quantity","battery_state","last_feed_time","next_feed_time","child_lock_switch","whether_in_sleep_mode","food_dispenser_state","food_outlet_state","today_eating_times","today_eating_time","display_selection","manual_feed","manual_lid_open","enable_feeding_plan","disable_feeding_plan","feeding_plan_enable","feeding_plan_disable","feeding_plan_delete","feeding_plan_skip_today","feeding_plan_unskip_today","feeding_plan_today_enable_all","feeding_plan_today_disable_all","feeding_plan_select","feeding_plan_today_select","feeding_schedule","desiccant_reset","desiccant_frequency","desiccant_cycle","light_on","light_off","light_switch","sound_on","sound_off","sound_switch","sound_level","display_on","display_off","display_switch","display_text","display_icon","sleep_on","sleep_off","food_low","door_state","door_blocked","vacuum_state","wifi_ssid","wifi_rssi","online","wi_fi","resolution","night_vision","enable_video_record","video_record_switch","video_record_mode","pump_air_state","ring_bell","rotate_food_bowl","reposition_schedule","next_feeding_day","next_feeding_time","next_feeding_end_time","manual_feed_now","manual_feed_quantity_cups","lid_close_time","lid_mode","lid_speed","temperature","plate_position","remaining_cleaning_days","remaining_filter_days","remaining_water","remaining_water_ml","weight_percent","use_water_interval","use_water_duration","weight_state","tank_total_ml","exception_message","volume_level","water_state","water_interval","water_dispensing_duration","water_dispensing_mode","water_low_threshold","water_sensing_delay","cleaning_cycle","cleaning_reset","filter_cycle","filter_reset","device_stopped_working","today_drinking_amount","yesterday_drinking_amount","today_drinking_time","today_avg_time","today_drinking_count","yesterday_drinking_count","battery_charge_state","battery_supply_8_hours","power_state","radar_sensing_level","radar_sensing_threshold","radar_gain","human_sensitivity_level","remaining_replacement_days","remaining_mat_days","filter_state","clean_state","mat_state","vacuum_mode","throw_mode","deodorization_mode","deodorization_mode_switch","deodorization_state_on","garbage_warehouse_state","running_state","clean_mode","volume","weight","rubbish_full_state","rubbish_inplace_state","door_open","barn_door_error","trigger_clean","trigger_empty_waste","trigger_level_litter","trigger_stop_action","trigger_open_door","trigger_close_door","trigger_vacuum","today_potty_times","today_potty_duration","after_deodorization_switch","avoid_repeat_clean","enable_auto_clean_in_sleep_mode","enable_deodorization_in_sleep_mode","auto_delay_sec","duration_after_deodorization","reset_cleaning","reset_filter","reset_mat",...Object.keys($e)].sort((e,t)=>t.length-e.length),xe=n`
+ */function he(e){return _e({...e,state:!0,attribute:!1})}const ue="0.9.0",ge="petlibro-card",be="petlibro-card-editor",fe=["pet_sex","breed_name","sterilization","bound_device_nums"],me=["food_low","food_status","manual_feed","today_feeding_schedule","feeding_plan_state","today_feeding_quantity_weight","rotate_food_bowl"],ve=["remaining_filter_days","remaining_water","remaining_water_volume"],ye=["rubbish_full_state","waste_bin_full","garbage_warehouse_state","waste_bin_state"],$e={wi_fi_signal_strength:"wifi_rssi",wi_fi_ssid:"wifi_ssid",wi_fi_s_s_i_d:"wifi_ssid",battery_level:"battery_state",battery_ac:"electric_quantity",buttons_lock:"child_lock_switch",remaining_desiccant_days:"remaining_desiccant",feeding_plan:"feeding_plan_state",display_value:"display_selection",todays_total_eating_time:"today_eating_time",camera_resolution:"resolution",night_vision_mode:"night_vision",video_recording_enabled:"enable_video_record",video_recording_switch:"video_record_switch",video_recording_mode:"video_record_mode",feeding_begins:"next_feeding_time",feeding_ends:"next_feeding_end_time",manually_open_close_lid:"manual_feed_now",remaining_water_volume:"remaining_water",todays_water_consumption:"today_drinking_amount",total_water_used_today:"today_drinking_amount",yesterdays_water_consumption:"yesterday_drinking_amount",todays_total_drinking_time:"today_drinking_time",todays_average_drinking_time:"today_avg_time",today_drinking_times:"today_drinking_count",yesterday_drinking_times:"yesterday_drinking_count",current_weight_percent:"weight_percent",water_time_duration:"use_water_duration",tank_capacity:"tank_total_ml",alert_message:"exception_message",power_source:"power_state",human_detection_sensitivity:"human_sensitivity_level",battery_status:"battery_charge_state",battery8_hour_supply:"battery_supply_8_hours",litter_level:"weight_percent",litter_weight:"weight",cleanliness_state:"clean_state",waste_bin_state:"garbage_warehouse_state",mat_replacement_days:"remaining_mat_days",filter_replacement_days:"remaining_replacement_days",food_dispenser:"food_dispenser_state",food_status:"food_low",today_s_feeding_schedule:"feeding_plan_state",wi_fi:"online",sleep_mode:"whether_in_sleep_mode",lid_status:"door_blocked",lid:"door_state",indicator:"light_switch",sound_status:"sound_switch",food_outlet:"food_outlet_state",device_error:"device_stopped_working",device_fault:"device_stopped_working",door_error:"barn_door_error",deodorization_active:"deodorization_state_on",display_status:"display_switch",waste_bin_full:"rubbish_full_state",waste_bin_installed:"rubbish_inplace_state",water_dispensing_state:"water_state",vacuum_active:"vacuum_state",door:"door_open",run_air_purifier:"trigger_vacuum",open_door:"trigger_open_door",close_door:"trigger_close_door",level_litter:"trigger_level_litter",empty_waste_bin:"trigger_empty_waste",start_clean_cycle:"trigger_clean",stop_current_action:"trigger_stop_action",manually_open_lid:"manual_lid_open",turn_on_sleep_mode:"sleep_on",turn_off_sleep_mode:"sleep_off",turn_on_sound:"sound_on",turn_off_sound:"sound_off",turn_on_indicator:"light_on",turn_off_indicator:"light_off",turn_on_display:"display_on",turn_off_display:"display_off",desiccant_replaced:"desiccant_reset",reposition_the_schedule:"reposition_schedule",enable_selected_plan:"feeding_plan_enable",disable_selected_plan:"feeding_plan_disable",delete_selected_plan:"feeding_plan_delete",skip_selected_plan_today:"feeding_plan_skip_today",un_skip_selected_plan_today:"feeding_plan_unskip_today",enable_today_s_feeding_schedule:"feeding_plan_today_enable_all",disable_today_s_feeding_schedule:"feeding_plan_today_disable_all",enable_feeding_schedule:"enable_feeding_plan",disable_feeding_schedule:"disable_feeding_plan",reset_cleaning_timer:"reset_cleaning",reset_filter_timer:"reset_filter",reset_mat_timer:"reset_mat",light:"light_switch",sound:"sound_switch",deodorization:"deodorization_mode_switch",after_use_deodorization:"after_deodorization_switch",auto_clean_in_sleep_mode:"enable_auto_clean_in_sleep_mode",deodorize_in_sleep_mode:"enable_deodorization_in_sleep_mode",icon_to_display:"display_icon",auto_clean_delay:"auto_delay_sec",post_use_deodorization_duration:"duration_after_deodorization",text_on_display:"display_text"},we=["today_feeding_quantity_weight","today_feeding_quantity_volume","last_feed_quantity_weight","last_feed_quantity_volume","next_feed_quantity_weight","next_feed_quantity_volume","enable_low_battery_notice","today_feeding_times","today_feeding_schedule","feeding_plan_state","remaining_desiccant","manual_feed_quantity","electric_quantity","battery_state","last_feed_time","next_feed_time","child_lock_switch","whether_in_sleep_mode","food_dispenser_state","food_outlet_state","today_eating_times","today_eating_time","display_selection","manual_feed","manual_lid_open","enable_feeding_plan","disable_feeding_plan","feeding_plan_enable","feeding_plan_disable","feeding_plan_delete","feeding_plan_skip_today","feeding_plan_unskip_today","feeding_plan_today_enable_all","feeding_plan_today_disable_all","feeding_plan_select","feeding_plan_today_select","feeding_schedule","desiccant_reset","desiccant_frequency","desiccant_cycle","light_on","light_off","light_switch","sound_on","sound_off","sound_switch","sound_level","display_on","display_off","display_switch","display_text","display_icon","sleep_on","sleep_off","food_low","door_state","door_blocked","vacuum_state","wifi_ssid","wifi_rssi","online","wi_fi","resolution","night_vision","enable_video_record","video_record_switch","video_record_mode","pump_air_state","ring_bell","rotate_food_bowl","reposition_schedule","next_feeding_day","next_feeding_time","next_feeding_end_time","manual_feed_now","manual_feed_quantity_cups","lid_close_time","lid_mode","lid_speed","temperature","plate_position","remaining_cleaning_days","remaining_filter_days","remaining_water","remaining_water_ml","weight_percent","use_water_interval","use_water_duration","weight_state","tank_total_ml","exception_message","volume_level","water_state","water_interval","water_dispensing_duration","water_dispensing_mode","water_low_threshold","water_sensing_delay","cleaning_cycle","cleaning_reset","filter_cycle","filter_reset","device_stopped_working","today_drinking_amount","yesterday_drinking_amount","today_drinking_time","today_avg_time","today_drinking_count","yesterday_drinking_count","battery_charge_state","battery_supply_8_hours","power_state","radar_sensing_level","radar_sensing_threshold","radar_gain","human_sensitivity_level","remaining_replacement_days","remaining_mat_days","filter_state","clean_state","mat_state","vacuum_mode","throw_mode","deodorization_mode","deodorization_mode_switch","deodorization_state_on","garbage_warehouse_state","running_state","clean_mode","volume","weight","rubbish_full_state","rubbish_inplace_state","door_open","barn_door_error","trigger_clean","trigger_empty_waste","trigger_level_litter","trigger_stop_action","trigger_open_door","trigger_close_door","trigger_vacuum","today_potty_times","today_potty_duration","after_deodorization_switch","avoid_repeat_clean","enable_auto_clean_in_sleep_mode","enable_deodorization_in_sleep_mode","auto_delay_sec","duration_after_deodorization","reset_cleaning","reset_filter","reset_mat",...Object.keys($e)].sort((e,t)=>t.length-e.length),xe=n`
   :host {
     display: block;
   }
@@ -624,7 +624,7 @@ const Be=1;let qe=class{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,
         .showStatus=${!n}
         .fallbackIcon=${this._getDeviceTypeIcon()}
       ></petlibro-card-header>
-    `}_renderDeviceContent(){if(!this._entities)return F;const e=this._config.show_controls??!0,t={hass:this.hass,entities:this._entities,showControls:e,actions:{press:e=>this._handleButtonPress(e),toggle:e=>this._handleSwitchToggle(e),select:(e,t)=>this._handleSelectChange(e,t),setNumber:(e,t)=>this._handleNumberChange(e,t)}};switch(this._deviceType){case"feeder":return function(e){const{hass:t,entities:i,showControls:o}=e,{press:s,toggle:r,select:n}=e.actions,a=Ee(t,i.sensors.electric_quantity),l=Ce(t,i.binary_sensors.food_low),d=Se(t,i.sensors.today_feeding_quantity_weight),c=Se(t,i.sensors.today_feeding_times),p=ze(t,i.sensors.last_feed_time),_=ze(t,i.sensors.next_feed_time),h=Se(t,i.sensors.next_feed_quantity_weight),u=void 0!==i.binary_sensors.feeding_plan_state,g=Ce(t,i.binary_sensors.feeding_plan_state),b=t.states[i.sensors.today_feeding_quantity_weight??""]?.attributes?.unit_of_measurement??"g",f=t.states[i.sensors.next_feed_quantity_weight??""]?.attributes?.unit_of_measurement??"g",m=Ce(t,i.binary_sensors.light_switch),v=Se(t,i.sensors.temperature),y=t.states[i.sensors.temperature??""]?.attributes?.unit_of_measurement??"°F",$=Se(t,i.sensors.plate_position),w=Se(t,i.sensors.next_feeding_time),x=Se(t,i.sensors.next_feeding_end_time),k=Se(t,i.sensors.next_feeding_day),A=void 0===a?"default":a<=20?"red":a<=50?"amber":"green";return q`
+    `}_renderDeviceContent(){if(!this._entities)return F;const e=this._config.show_controls??!0,t={hass:this.hass,entities:this._entities,showControls:e,actions:{press:e=>this._handleButtonPress(e),toggle:e=>this._handleSwitchToggle(e),select:(e,t)=>this._handleSelectChange(e,t),setNumber:(e,t)=>this._handleNumberChange(e,t)}};switch(this._deviceType){case"feeder":return function(e){const{hass:t,entities:i,showControls:o}=e,{press:s,toggle:r,select:n}=e.actions,a=Ee(t,i.sensors.electric_quantity),l=Ce(t,i.binary_sensors.food_low),d=Se(t,i.sensors.today_feeding_quantity_weight),c=Se(t,i.sensors.today_feeding_times),p=ze(t,i.sensors.last_feed_time),_=ze(t,i.sensors.next_feed_time),h=Se(t,i.sensors.next_feed_quantity_weight),u=i.binary_sensors.today_feeding_schedule??i.binary_sensors.feeding_plan_state,g=void 0!==u,b=Ce(t,u),f=t.states[i.sensors.today_feeding_quantity_weight??""]?.attributes?.unit_of_measurement??"g",m=t.states[i.sensors.next_feed_quantity_weight??""]?.attributes?.unit_of_measurement??"g",v=Ce(t,i.binary_sensors.light_switch),y=Se(t,i.sensors.temperature),$=t.states[i.sensors.temperature??""]?.attributes?.unit_of_measurement??"°F",w=Se(t,i.sensors.plate_position),x=Se(t,i.sensors.next_feeding_time),k=Se(t,i.sensors.next_feeding_end_time),A=Se(t,i.sensors.next_feeding_day),S=void 0===a?"default":a<=20?"red":a<=50?"amber":"green";return q`
     ${l?q`
       <div class="chip-row">
         <petlibro-chip icon="mdi:bowl-mix-outline" variant="warn">Food Low</petlibro-chip>
@@ -635,7 +635,7 @@ const Be=1;let qe=class{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,
       ${void 0!==a?q`
         <petlibro-tile
           .icon=${Pe(a)}
-          .color=${A}
+          .color=${S}
           label="Battery"
           value="${Math.round(a)}%"
         ></petlibro-tile>
@@ -653,7 +653,7 @@ const Be=1;let qe=class{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,
           icon="mdi:scale"
           color="blue"
           label="Fed Today"
-          value="${d} ${b}${c?` (${c}x)`:""}"
+          value="${d} ${f}${c?` (${c}x)`:""}"
         ></petlibro-tile>
       `:F}
 
@@ -666,43 +666,43 @@ const Be=1;let qe=class{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,
           icon="mdi:calendar-arrow-right"
           color="amber"
           label="Next Feed"
-          value="${_}${h?` (${h} ${f})`:""}"
+          value="${_}${h?` (${h} ${m})`:""}"
         ></petlibro-tile>
       `:F}
 
-      ${u?q`
+      ${g?q`
         <petlibro-tile
           icon="mdi:calendar-check"
           color="purple"
           label="Feeding Plan"
-          value=${g?"Active":"Inactive"}
+          value=${b?"Active":"Inactive"}
         ></petlibro-tile>
       `:F}
 
-      ${void 0!==v?q`
+      ${void 0!==y?q`
         <petlibro-tile
           icon="mdi:thermometer"
           color="amber"
           label="Temperature"
-          value="${v}${y}"
-        ></petlibro-tile>
-      `:F}
-
-      ${void 0!==$?q`
-        <petlibro-tile
-          icon="mdi:rotate-3d-variant"
-          color="purple"
-          label="Plate Position"
-          value=${String($)}
+          value="${y}${$}"
         ></petlibro-tile>
       `:F}
 
       ${void 0!==w?q`
         <petlibro-tile
+          icon="mdi:rotate-3d-variant"
+          color="purple"
+          label="Plate Position"
+          value=${String(w)}
+        ></petlibro-tile>
+      `:F}
+
+      ${void 0!==x?q`
+        <petlibro-tile
           icon="mdi:clock-outline"
           color="amber"
           label="Next Feeding"
-          value="${k?`${k} `:""}${w}${x?` – ${x}`:""}"
+          value="${A?`${A} `:""}${x}${k?` – ${k}`:""}"
         ></petlibro-tile>
       `:F}
     </div>
@@ -739,7 +739,7 @@ const Be=1;let qe=class{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,
           >Ring</petlibro-pill-button>
         `:F}
 
-        ${Ue(i,m,s)}
+        ${Ue(i,v,s)}
       </div>
     `:F}
 
