@@ -90,7 +90,6 @@ export const KEY_ALIASES: Record<string, string> = {
   'battery_status': 'battery_charge_state',
   'battery8_hour_supply': 'battery_supply_8_hours',
   // Litter box sensors
-  'litter_level': 'weight_percent',
   'litter_weight': 'weight',
   'cleanliness_state': 'clean_state',
   'waste_bin_state': 'garbage_warehouse_state',
@@ -264,6 +263,7 @@ export const ALL_KNOWN_KEYS = [
   'remaining_water',
   'remaining_water_ml',
   'weight_percent',
+  'litter_level',
   'use_water_interval',
   'use_water_duration',
   'weight_state',

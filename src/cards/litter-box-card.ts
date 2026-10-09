@@ -27,6 +27,10 @@ export function renderLitterBoxCard(ctx: CardContext): TemplateResult {
     return times[0] ? `${times[0]}${enabled.length > 1 ? ` +${enabled.length - 1}` : ''}` : undefined;
   })();
   const battery = getNumericState(hass, entities.sensors.electric_quantity);
+  // Integration v2.7.0+ reports the litter supply as a state (GOOD, ...).
+  // Older releases only expose a weight percentage, which reads 0 on the Luma.
+  const litterState = getStateValue(hass, entities.sensors.litter_level);
+  const litterKnown = litterState !== undefined && !['unknown', 'unavailable'].includes(String(litterState));
   const litterPercent = getNumericState(hass, entities.sensors.weight_percent);
   const wasteFull = isEntityOn(hass, entities.binary_sensors.rubbish_full_state);
   const runningState = getStateValue(hass, entities.sensors.running_state);
@@ -69,7 +73,14 @@ export function renderLitterBoxCard(ctx: CardContext): TemplateResult {
         ></petlibro-tile>
       ` : nothing}
 
-      ${litterPercent !== undefined ? html`
+      ${litterKnown ? html`
+        <petlibro-tile
+          icon="mdi:grain"
+          color=${String(litterState) === 'GOOD' ? 'green' : 'amber'}
+          label="Litter Level"
+          value=${String(litterState)}
+        ></petlibro-tile>
+      ` : litterPercent !== undefined ? html`
         <petlibro-tile
           icon="mdi:gauge"
           color="purple"
