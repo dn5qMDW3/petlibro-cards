@@ -333,7 +333,7 @@ export const ALL_KNOWN_KEYS = [
   'reset_cleaning',
   'reset_filter',
   'reset_mat',
-  // Integration releases after v2.7.1: running operation, air purifier and coverage settings
+  // Integration v2.8.0+: running operation, air purifier and coverage settings
   'operation_status',
   'enable_adsorption',
   'deodorization_timer_off',

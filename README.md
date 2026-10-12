@@ -90,9 +90,9 @@ to display:
 | **v2.5.2+** | Real-time MQTT push, so the card reflects device changes within about a second instead of waiting for the next poll |
 | **v2.5.3+** | Litter box cleaning schedules and per-device notification toggles as entities |
 | **v2.7.0+** | The litter box's real litter level, and the Dockstream 2 indicator as a switch |
-| **after v2.7.1** (unreleased) | The litter box Status tile shows the running operation (Cleaning, Leveling, Emptying, Paused, …) instead of IDLE / RUNNING, plus Coverage Assist, Purifier Auto-Off and manual fan speed controls |
+| **v2.8.0+** | The litter box Status tile shows the running operation (Cleaning, Leveling, Emptying, Paused, …) instead of IDLE / RUNNING, plus Coverage Assist, Purifier Auto-Off and manual fan speed controls |
 
-Integration **v2.6.0 and later need card v0.9.1 or newer**: the integration renamed the dry feeders' today's-schedule sensor and, in v2.7.0, replaced the Dockstream 2 indicator buttons with a switch. Older cards lose the feeder's plan row and the fountain's Light button. The litter level tile needs card v0.9.2. The operation status and the new litter box controls need a card newer than v0.9.2.
+Integration **v2.6.0 and later need card v0.9.1 or newer**: the integration renamed the dry feeders' today's-schedule sensor and, in v2.7.0, replaced the Dockstream 2 indicator buttons with a switch. Older cards lose the feeder's plan row and the fountain's Light button. The litter level tile needs card v0.9.2. The operation status and the new litter box controls need card v0.9.3.
 
 If a value shows as unavailable, check the device in **Settings → Devices &
 Services → PETLIBRO** first — the card only ever renders entities the
