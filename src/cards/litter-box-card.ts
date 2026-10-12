@@ -34,6 +34,13 @@ export function renderLitterBoxCard(ctx: CardContext): TemplateResult {
   const litterPercent = getNumericState(hass, entities.sensors.weight_percent);
   const wasteFull = isEntityOn(hass, entities.binary_sensors.rubbish_full_state);
   const runningState = getStateValue(hass, entities.sensors.running_state);
+  // Newer integration releases report what the box is doing (cleaning,
+  // leveling, emptying, paused, ...), which says more than IDLE / RUNNING.
+  const operation = getStateValue(hass, entities.sensors.operation_status);
+  const operationLabel = operation === undefined
+    ? undefined
+    : operation.charAt(0).toUpperCase() + operation.slice(1);
+  const operationActive = operation !== undefined && operation !== 'idle';
   const cleaningDays = getStateValue(hass, entities.sensors.remaining_cleaning_days);
   const deodorMode = getStateValue(hass, entities.sensors.deodorization_mode);
   const lightOn = isEntityOn(hass, entities.switches.light_switch);
@@ -51,6 +58,8 @@ export function renderLitterBoxCard(ctx: CardContext): TemplateResult {
   const hasSettings = !!(
     entities.selects.clean_mode_select ||
     entities.selects.deodorization_wind_speed_select ||
+    entities.selects.manual_deodorization_wind_speed ||
+    entities.selects.deodorization_timer_off_interval ||
     entities.numbers.volume_control ||
     entities.numbers.auto_delay_sec ||
     entities.numbers.duration_after_deodorization
@@ -98,7 +107,14 @@ export function renderLitterBoxCard(ctx: CardContext): TemplateResult {
         value=${wasteFull ? 'Full' : 'OK'}
       ></petlibro-tile>
 
-      ${runningState !== undefined ? html`
+      ${operationLabel !== undefined ? html`
+        <petlibro-tile
+          icon=${operation === 'paused' ? 'mdi:pause-circle-outline' : operationActive ? 'mdi:progress-clock' : 'mdi:state-machine'}
+          color=${operation === 'paused' ? 'amber' : operationActive ? 'green' : 'blue'}
+          label="Status"
+          value=${operationLabel}
+        ></petlibro-tile>
+      ` : runningState !== undefined ? html`
         <petlibro-tile
           icon="mdi:state-machine"
           color="blue"
@@ -194,6 +210,22 @@ export function renderLitterBoxCard(ctx: CardContext): TemplateResult {
           >No Repeat</petlibro-pill-button>
         ` : nothing}
 
+        ${entities.switches.enable_adsorption ? html`
+          <petlibro-pill-button
+            icon="mdi:layers-outline"
+            ?active=${isEntityOn(hass, entities.switches.enable_adsorption)}
+            @click=${() => onSwitchToggle(entities.switches.enable_adsorption)}
+          >Coverage Assist</petlibro-pill-button>
+        ` : nothing}
+
+        ${entities.switches.deodorization_timer_off ? html`
+          <petlibro-pill-button
+            icon="mdi:timer-off-outline"
+            ?active=${isEntityOn(hass, entities.switches.deodorization_timer_off)}
+            @click=${() => onSwitchToggle(entities.switches.deodorization_timer_off)}
+          >Purifier Auto-Off</petlibro-pill-button>
+        ` : nothing}
+
         ${entities.switches.enable_auto_clean_in_sleep_mode ? html`
           <petlibro-pill-button
             icon="mdi:broom"
@@ -237,6 +269,8 @@ export function renderLitterBoxCard(ctx: CardContext): TemplateResult {
       <div class="settings">
         ${renderSelectRow(hass, entities.selects.clean_mode_select, 'mdi:broom', 'purple', 'Clean Mode', onSelectChange)}
         ${renderSelectRow(hass, entities.selects.deodorization_wind_speed_select, 'mdi:weather-windy', 'blue', 'Wind Speed', onSelectChange)}
+        ${renderSelectRow(hass, entities.selects.manual_deodorization_wind_speed, 'mdi:fan', 'blue', 'Manual Fan Speed', onSelectChange)}
+        ${renderSelectRow(hass, entities.selects.deodorization_timer_off_interval, 'mdi:timer-off-outline', 'amber', 'Auto-Off After (min)', onSelectChange)}
         ${renderNumberStepper(hass, entities.numbers.volume_control, 'mdi:volume-high', 'purple', 'Volume', '%', onNumberChange, 10)}
         ${renderNumberStepper(hass, entities.numbers.auto_delay_sec, 'mdi:timer-outline', 'amber', 'Clean Delay', 's', onNumberChange, 10)}
         ${renderNumberStepper(hass, entities.numbers.duration_after_deodorization, 'mdi:air-purifier', 'green', 'Deodorize Time', 'm', onNumberChange)}

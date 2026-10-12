@@ -333,6 +333,12 @@ export const ALL_KNOWN_KEYS = [
   'reset_cleaning',
   'reset_filter',
   'reset_mat',
+  // Integration releases after v2.7.1: running operation, air purifier and coverage settings
+  'operation_status',
+  'enable_adsorption',
+  'deodorization_timer_off',
+  'deodorization_timer_off_interval',
+  'manual_deodorization_wind_speed',
   // --- Name-based aliases (HA entity_id suffixes derived from entity names) ---
   ...Object.keys(KEY_ALIASES),
 ].sort((a, b) => b.length - a.length);
